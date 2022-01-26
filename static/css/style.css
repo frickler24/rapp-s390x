@@ -1,0 +1,58 @@
+.sidebar-nav {
+    margin-top: 3em;
+    padding: 0;
+    padding-bottom: 4em;
+    list-style: none;
+}
+
+.navbar-brand {
+    #font-family: 'Audiowide', cursive;
+    font-family: 'Faster One', cursive;
+}
+
+strong {
+	color: darkgreen;
+}
+
+.col-sm-2 {
+    background: #2222;
+}
+
+.version {
+    color: rgba(255,255,255,.75);
+}
+
+body {
+    color: #000055;
+}
+
+h4 {
+    padding-bottom: 1rem;
+}
+
+#header {
+    background-color: #02c304;
+}
+.login {
+    color: magenta;
+}
+
+.knappeTabelle {
+    padding-right: 1rem !important;
+    padding-top:   0rem !important;
+    padding-left:  0rem !important;
+    padding-bottom:0rem !important;
+    color: #0B173B;
+}
+
+-breiteTabelle {
+	white-space: nowrap;
+	overflow: scroll;
+}
+
+.vllzulangertext {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+

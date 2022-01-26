@@ -1,0 +1,51 @@
+{% if aftf_dict %}
+    <div class="card">
+        <div class="card-header" id="headingAFTF">
+            <h5 class="mb-0">
+                <button class="btn btn-success collapsed"
+                        data-toggle="collapse"
+                        data-target="#collapseAFTF"
+                        aria-expanded="false"
+                        aria-controls="collapseAFTF">
+                    Auflistung der genutzten Technischen Funktionen TF
+                </button>
+            </h5>
+        </div>
+
+        <div id="collapseAFTF" class="collapse" aria-labelledby="headingAFTF" data-parent="#accordion">
+            <div class="card-body">
+                <h3>Auflistung der Technischen Funktionen (TF)</h3>
+                <table class="table table-striped table-sm" id="UhR_AFTF_table">
+                    <thead>
+                        <tr class="bg-primary text-left">
+                            <th>Name AF</th>
+                            <th>Name TF</th>
+                            <th>Beschreibung</th>
+                            <th>TF-Kritikalität</th>
+                            <th>Eigentümer-Orga</th>
+                            <th>Plattform</th>
+                            <th>Direct Connect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for af, tf_dict in aftf_dict.items %}
+                            {% for tf in tf_dict|dictsort:"tf" %}
+                                <tr>
+                                    <td>{% ifchanged af %}{{ af }}{% endifchanged %}</td>
+                                    <td>{{ tf.tf }}</td>
+                                    <td>{{ tf.tf_beschreibung }}</td>
+                                    <td>{{ tf.tf_kritikalitaet }}</td>
+                                    <td>{{ tf.tf_eigentuemer_org }}</td>
+                                    <td>{{ tf.plattform__tf_technische_plattform }}</td>
+                                    <td>{{ tf.direct_connect }}</td>
+                                </tr>
+                            {% endfor tf_dict %}
+                        {% endfor aftf_dict %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div>Keine TF-Menge geliefert</div>
+{% endif %}

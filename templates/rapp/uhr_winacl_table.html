@@ -1,0 +1,55 @@
+{% if winacl_liste %}
+    <div class="card">
+        <div class="card-header" id="headingWinacl">
+            <h5 class="mb-0">
+                <button class="btn btn-info collapsed"
+                        data-toggle="collapse"
+                        data-target="#collapseWinacl"
+                        aria-expanded="false"
+                        aria-controls="collapseWinacl">
+                    Auflistung der zugehörenden Windows-Laufwerksrechte ({{ winacl_liste|length }} Elemente)
+                </button>
+            </h5>
+        </div>
+
+        <div id="collapseWinacl" class="collapse" aria-labelledby="headingWinacl" data-parent="#accordion">
+            <div class="card-body">
+                <h3>Auflistung der zugehörenden Windows-Laufwerksrechte</h3>
+                <table class="table table-striped table-sm" id="UhR_winacl_table">
+                    <thead>
+                        <tr class="bg-primary text-left">
+                            <th>Name AD-TF</th>
+                            <th>Zugriff</th>
+                            <th>Server</th>
+                            <th>Pfad</th>
+                            <th>Aktualität</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tf in winacl_liste %}
+                            <tr id="WinACL_{{ grant.grantee }}">
+                                <td>{% ifchanged tf.tf %}{{ tf.tf }}{% endifchanged %}</td>
+                                <td>{{ tf.zugriff }}</td>
+                                <td>{{ tf.server }}</td>
+                                <td>{{ tf.pfad }}</td>
+                                <td>{{ tf.letzte_aenderung }}</td>
+                            </tr>
+                        {% endfor winacl_liste %}
+                    </tbody>
+                </table>
+   				<hr />
+				{% if winnoe %}
+					<h4>Folgende TFen müssen in den jeweiligen Systemen nachgeschlagen werden</h4>
+					<p>
+						{% for e in winnoe %}
+							{{ e }}{% if not forloop.last %},{% endif %}
+						{% endfor %}
+					</p>
+				{% endif %}
+
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div>Keine ACL-Daten geliefert</div>
+{% endif %}

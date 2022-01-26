@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active"><a href="{% url 'teamliste' %}">Team-Liste</a></li>
+    <li class="breadcrumb-item active">Team-Detail</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Team-Liste - {{ block.super }}
+{% endblock %}
+
+{% load static %}
+{% block content %}
+
+    <h1>
+        {% if object.team %}
+        User-Eintrag ändern für <strong>{{ object.name }}</strong>
+        {% else %}
+            Neuen Team-Eintrag anlegen
+        {% endif %}
+    </h1>
+    <p>&nbsp;</p>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        </table>
+        <p>&nbsp;</p>
+        <table>
+            <tr>
+                <td>
+                    <input type="submit" value="Submit" />
+                </td>
+                {% if object.team %}
+                    <td>
+                       <a href="{{ object.get_absolute_delete_url }}" > Eintrag löschen
+                            <img src="{% static 'delete.svg' %}" width="15" />
+                        </a>
+                    </td>
+                {% endif %}
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                    <a href="{% url 'teamliste' %}">Bearbeitung abbrechen!</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+{% endblock %}

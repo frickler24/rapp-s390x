@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active">Ungenutzte AFGF-Kombinationen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Ungenutzte aber genehmigte AFGF-Kombinationen - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-md-6 col-lg-6 col-xl-6" style="text-align: bottom;">
+                <h1>Ungenutzte AFGF-Kombinationen</h1>
+            </div>
+            <div class="col-6 mt-6">
+                <h5>
+                    Auflistung definierter AF-GF-Kombinationen, die keinem User zugeordnet sind
+                </h5>
+                <p>Betrachtet werden sowohl die aktiven als auch die historisierten Berechtigungen</p>
+            </div>
+        </div>
+        <div class="row mb-5 align-bottom">
+        </div>
+    </div>
+
+    <div class="container">
+        {% if antwort %}
+            <div class="row">
+                <div class="col-2">
+                    <strong>ID</strong>
+                </div>
+                <div class="col-5">
+                    <strong>AF-Name</strong>
+                </div>
+                <div class="col-5">
+                    <strong>GF-Name</strong>
+                </div>
+                {% for key, liste in antwort.items %}
+                    <div class="col-2" style="text-align: bottom;">
+                        <a href="{% url 'admin:rapp_tbluebersichtafgfs_change' key %}" target="_blank" >
+                        {{ key }}
+                        </a>
+                    </div>
+                    {% for zeile in liste %}
+                        <div class="col-5" style="text-align: bottom;">
+                            <a href="{% url 'admin:rapp_tbluebersichtafgfs_change' key %}" target="_blank" >
+                            {{ zeile }}
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Es gibt keine ungenutzten Teams, oder die Antwort war falsch.</p>
+            {% if fehler %}
+                <p>Fehlermeldung: {{ fehler }}</p>
+            {% endif %}
+        {% endif %}
+    </div>
+    <p>&nbsp;</p>
+
+{% endblock %}

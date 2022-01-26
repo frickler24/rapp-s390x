@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">Suche</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Filter - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+		<form method="get">
+			<div class="well">
+			   {% comment for field in filter.form.visible_fields %}
+					<div class="form-group">
+						<label for="{{ field.id_for_label }}">{{ field.label }}, {{ field.name }}</label>
+							{{ field | add_class:'form-control' }}
+						{% for error in field.errors %}
+							<span class="help-block">{{ error }}</span>
+						{% endfor %}
+					</div>
+				{% endfor %}
+				{% endcomment %}
+
+				<div class="row">
+
+					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
+						<label for="{{ filter.form.userid_name__userid.id_for_label }}">UserID:</label>
+						{%comment%}{{ kein_filter.form.userid_name__userid.label_tag }}{%endcomment%}
+						{% render_field filter.form.userid_name__userid class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+						<label for="{{ filter.form.userid_name__name.id_for_label }}">Name beginnt mit:</label>
+						{% render_field filter.form.userid_name__name class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-3">
+						<label for="{{ filter.form.userid_name__orga.id_for_label }}">Team:</label>
+						{% render_field filter.form.userid_name__orga class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-2">
+						<label for="{{ filter.form.tf_beschreibung.id_for_label }}">TF-Beschreibung</label>
+						{% render_field filter.form.tf_beschreibung class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-2">
+						<label for="{{ filter.form.userid_name__gruppe_for_label }}">Gruppe enthält:</label>
+						{% render_field filter.form.userid_name__gruppe class="form-control" %}
+					</div>
+
+					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+						{{ filter.form.enthalten_in_af.label_tag }}
+						{% render_field filter.form.enthalten_in_af class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-3 col-xl-3">
+						{{ filter.form.tf.label_tag }}
+						{% render_field filter.form.tf class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+						<label for="{{ filter.form.userid_name__zi_organisation.id_for_label }}">ZI-Organisation:</label>
+						{% render_field filter.form.userid_name__zi_organisation class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2 col-xl-2">
+						<label for="{{ filter.form.geloescht_for_label }}">Recht gelöscht:</label>
+						{% render_field filter.form.geloescht class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2 col-xl-2">
+						<label for="{{ filter.form.userid_name__geloescht_for_label }}">User gelöscht:</label>
+						{% render_field filter.form.userid_name__geloescht class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-3 col-xl-2">
+						{{ filter.form.plattform.label_tag }}
+						{% render_field filter.form.plattform class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
+						{{ filter.form.modell__name_af_neu.label_tag }}
+						{% render_field filter.form.modell__name_af_neu class="form-control" %}
+					</div>
+					{% comment %}
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
+						{{ filter.form.modell__name_gf_neu.label_tag }}
+						{% render_field filter.form.modell__name_gf_neu class="form-control" %}
+					</div>
+					{% endcomment %}
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-1 col-xl-1">
+						<label for="{{ filter.form.tf_kritikalitaet_for_label }}">TF-Krit.:</label>
+						{% render_field filter.form.tf_kritikalitaet class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-6 col-md-2 col-lg-2 col-xl-2">
+						{{ filter.form.gf.label_tag }}
+						{% render_field filter.form.gf class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-2 col-lg-2 col-xl-2">
+						<label for="{{ filter.form.direct_connect_for_label }}">Direktverbdg. enthält:</label>
+						{% render_field filter.form.direct_connect class="form-control" %}
+					</div>
+					<div class="form-group col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
+						<label for="pagesize">Zeilen pro Seite</label>
+						<input class="input" id="pagesize" name="pagesize" type="text" maxlength="5"
+							   style="width: 10em;"
+						{% if pagesize %}
+		 					value="{{ pagesize }}"
+						{% endif %}
+						/>
+					</div>
+				</div>
+
+				{% comment %} Suche, Export- und Abbruch-Buttons {% endcomment %}
+
+				<div class="form-group margin-top-3">
+					<button type="submit" class="btn btn-primary btn-sm">Suche</button>
+					<a href="{% url 'panel_download' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+						class="btn btn-outline-primary btn-sm"
+						role="button">
+						Daten herunterladen
+						{% if gesamtzahl <= 500 %}
+							<span class="badge badge-success">
+						{% elif gesamtzahl <= 2000 %}
+							<span class="badge badge-primary">
+						{% elif gesamtzahl <= 10000 %}
+							<span class="badge badge-warning">
+						{% else %}
+							<span class="badge badge-danger">
+						{% endif %}
+							{{ gesamtzahl }}</span>
+					</a>
+					<a href="{% url 'home' %}"
+						class="btn btn-secondary btn-sm"
+						role="button">
+						Abbrechen
+					</a>
+					<p></p>
+				</div>
+			</div>
+		</form>
+	</div>
+
+    {% comment %} Die Ergebnismenge, manuell zu einer Tabelle zusammengestellt {% endcomment %}
+	<table class="table table-bordered vllzulangertext">
+		<thead>
+			<tr class="bg-primary">
+				<th>Name</th>
+				<th>Team</th>
+				<th>TF</th>
+				<th>AF</th>
+				<th>AF-Beschreibung</th>
+				<th>Max Krit in AF</th>
+				<th>TF Beschreibung</th>
+				<th>GF</th>
+				<th>GF-Beschreibung</th>
+				<th>ZI-Orga</th>
+				<th>Plattform</th>
+				<th>TF-Kritikalität</th>
+				<th>Recht aktiv</th>
+				<th>User aktiv</th>
+
+				<th>loeschdatum</th>
+				<th>AF gültig ab</th>
+				<th>AF gültig bis</th>
+				<th>Direct Connect</th>
+				<th>AF Zuweisungsdatum</th>
+				<th>TF-Eigentümer-Orga</th>
+				<th>gefunden</th>
+				<th>wiedergefunden</th>
+				<th>letzte Änderung</th>
+				<th>AF Neu</th>
+				<th>GF Neu</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in pages %}
+				<tr>
+					<td class="vllzulangertext knappeTabelle">{{ row.userid_name }}</td>
+                    <td class="vllzulangertext knappeTabelle">{{ row.userid_name.orga }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.tf }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.enthalten_in_af }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.af_beschreibung }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.hoechste_kritikalitaet_tf_in_af }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.tf_beschreibung }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.gf }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.gf_beschreibung | lower }}</td>
+                    <td class="vllzulangertext knappeTabelle">{{ row.userid_name.zi_organisation }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.plattform }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.tf_kritikalitaet | lower }}</td>
+
+                    {# Das "Gelöscht"-Flag wird als aktiv angezeigt und damit invertiert als Grafik #}
+                    <td align="center" class="knappeTabelle">
+                        {% if row.geloescht %}
+                            <a href="{{ user.get_absolute_toggle_geloescht_url }}">
+                                <img src="{% static 'admin/img/icon-no.svg' %}">
+                            </a>
+                        {% else %}
+                            <a href="{{ user.get_absolute_toggle_geloescht_url }}">
+                                <img src="{% static 'admin/img/icon-yes.svg' %}">
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td align="center" class="knappeTabelle">
+                        {% if row.userid_name.geloescht %}
+                            <a href="{{ user.get_absolute_toggle_geloescht_url }}">
+                                <img src="{% static 'admin/img/icon-no.svg' %}">
+                            </a>
+                        {% else %}
+                            <a href="{{ user.get_absolute_toggle_geloescht_url }}">
+                                <img src="{% static 'admin/img/icon-yes.svg' %}">
+                            </a>
+                        {% endif %}
+                    </td>
+
+					<td class="vllzulangertext knappeTabelle">{{ row.loeschdatum | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.af_gueltig_ab | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.af_gueltig_bis | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.direct_connect | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.af_zuweisungsdatum | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.tf_eigentuemer_org | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.gefunden | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.wiedergefunden | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.letzte_aenderung | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_af_neu }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_gf_neu }}</td>
+				</tr>
+			{% empty %}
+				<tr>
+					<td colspan="5">Keine Treffer</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% include "paginator.html" %}
+{% endblock content %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">Aufsetzen der Datenbank</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Aktualisierung Stored Procedures - {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+	<div class="container">
+        <h2>
+            Aufsetzen der Datenbank mit <em>Stored Procedures</em>
+        </h2>
+        <p>
+            <strong>ACHTUNG!
+        </p>
+        <p>
+            Diese Funktion sollte nur angewandt werden, wenn einer der folgenden Fälle zutrifft:
+        </p>
+        <ul>
+            <li>Die Datenbank wird komplett neu aufgesetzt</li>
+            <li>Das Importieren neuer CSV-Listen führt nachweislich in den Stored Procedures zu harten Fehlern (z.B. fehlende SP)</li>
+            <li>Die Quellen der Stored Procedures wurden in 'stored_procedures.py' geändert</li>
+        </ul></strong>
+        <h4 class="mt-5">
+            Ansonsten: Finger weg, das bringt hier nichts!
+        </h4>
+
+        {% if form.non_field_errors %}
+            <div class="container alert-danger bp-3">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="post" name="import" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% for zeile, val in daten.items %}
+                <div class="form-group form-group-sm col-12 {% if not val %}bg-success{% else %}bg-danger{% endif %}">
+                    <ul>
+                        <li>
+                            {{ zeile }} war {% if val %}nicht {% endif %}erfolgreich.
+                            {% if val %}<br />{{ val }}{% endif %}
+                        </li>
+                    </ul>
+                </div>
+            {% endfor %}
+                <div class="container bg-light py-3 mt-3">
+                    <button class="btn btn-outline-danger" type="submit" name="hochladen" value="submit">Hochladen</button>
+                </div>
+            </form>
+	</div>
+{% endblock %}

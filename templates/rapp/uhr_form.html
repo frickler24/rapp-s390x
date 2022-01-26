@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item"><a href="{% url 'user_rolle_af' %}{{ request.GET.user }}/?{% for key,value in request.GET.items %}{%if key != 'user' %}&{{ key }}={{ value }}{%endif %}{%endfor %}">
+         User, Rollen und Arbeitsplatzfunktionen
+    </a></li>
+    <li class="breadcrumb-item active">Rolle hinzufügen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Rollen ergänzen - {{ block.super }}
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+    <h4>
+        Rollen-Eintrag ergänzen für <strong>{{ username }}</strong>
+    </h4>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        </table>
+        <p>&nbsp;</p>
+        <table style="width: 50%;">
+            <tr>
+                <td>
+                    <input type="submit" value="Ja, bitte anlegen" />
+                </td>
+                <td>
+                    <a href="{% url 'user_rolle_af' %}{{ request.GET.user }}?{% for key,value in request.GET.items %}{%if key != 'user' %}&{{ key }}={{ value }}{%endif %}{%endfor %}">
+                        <button class="btn btn-primary btn-sm" type="button">
+                            Nein, bitte abbrechen!
+                        </button>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </form>
+{% endblock content %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">Zeige ungenutzte Rollen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Zeige ungenutzte Rollen - {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+	<div class="container">
+        {% include 'rapp/meldungen.html' %}
+
+            <div class="container alert-normal">
+                {% for elem in liste %}
+                <div class="row">
+                    <div class="form-group col-10">
+                        <a href="{% url 'admin:rapp_tblrollen_change' elem.rollenname %}" target="_blank" >
+                        {{ elem.rollenname }}
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                 <div class="row">
+                    <div class="form-group alert alert-success" role="alert">
+                        Keine ungenutzten Rollen gefunden.
+                    </div>
+                </div>
+                {% endfor liste %}
+            </div>
+        </form>
+    </div>
+{% endblock %}

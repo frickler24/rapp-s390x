@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'import' %}">Import neuer Daten</a></li>
+	<li class="breadcrumb-item active">Schritt 2 - manuelle Sichtung</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Import neuer Daten - {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+	<div class="container">
+        {% include 'rapp/import_anleitung.html' %}
+        {% include 'rapp/import_fehler.html' %}
+        <p>&nbsp;</p>
+
+        {% if fehler %}
+            <div class="container bg-danger py-3 mt-1">
+                ACHTUNG! <br />
+                Aufruf der Stored Procedure 'behandleUser' lieferte folgende Meldung:<br />
+                {{ fehler }}
+            </div>
+            <p>&nbsp;</p>
+        {% endif %}
+
+        <h4>Neue und gelöschte User</h4>
+        <p>
+            Unten sind noch einmal die neuen User aufgeführt,
+            deren Zustand bereits in der Datenbak aktualisiert wurde.<br />
+            In der User-Tabelle müssen nun die folgenden Änderungen manuell nachgezogen werden:
+        </p>
+        <ol>
+            <li>Zu allen neuen Usern müssen die Abteilung, die Gruppe und das Team angepasst werden</li>
+            <li>
+                Zu den Usern, die wieder aktiviert wurden (erkennbar an der '1' in der Spalte "gelöscht"),<br />
+                müssen die Abteilung, die Gruppe und das Team kontrolliert und gegebenenfalls angepasst werden
+            </li>
+        </ol>
+        <p>
+            Die Einstellungen erfolgen idealerweise direkt über die Links in der Tabelle
+            (soweit Daten vorhanden sind).
+        </p>
+        <p>
+            Bitte wählen Sie noch die Suche nach Doppeleinträgen aus,
+            falls der Eindruck besteht,
+            dass solche existieren könnten
+            (bspw. nach Fehlimporten oder Importen fehlerhafter Daten).
+        </p>
+
+        <p>Anschließend kann die weitere Verarbeitung über den roten Button unten angestoßen
+            oder der Vorgang abgebrochen werden. </p>
+
+        <p>&nbsp;</p>
+        <div class="container alert-secondary">
+            <h5>Liste neuer oder wiedergefundener User</h5>
+            <div class="row">
+                {% if request.session.neueUser %}
+                    {% with links=1 %}
+                        {% include 'rapp/import2_tabelle.html' %}
+                    {% endwith %}
+                {% else %}
+                    <p class="ml-5">Keine neuen User gefunden</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <form id="form2b" method="post" name="import" novalidate>
+            {% csrf_token %}
+            <div class="container bg-light">
+                <div class="row">
+                    <div class="col col-xs-9 col-sm-7 col-md-6 col-lg-5 col-xl-4 mt-2">
+                        {{ form.doppelte_suchen.label_tag }}
+                    </div>
+                    <div class="col col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xl-1 mt-2">
+                        {% render_field form.doppelte_suchen class="form-control" %}
+                    </div>
+                </div>
+            </div>
+            <hr />
+           <div class="container bg-light py-3 mt-1 alert-danger">
+               <div class="row">
+                    <div class="row my-3" id="loading2" style="display:none;">
+                        <img src="{% static 'loading.gif' %}" alt="Lade..." />
+                    </div>
+               </div>
+               <div class="row">
+                   <div class="col py-3 col-xs-8 col-sm-8 col-md-4 col-lg-3 col-xl-3">
+                        <button class="btn btn-outline-danger" type="submit" id="hochladen"
+                                name="hochladen" value="submit">Inhalte aktualisieren!</button>
+                   </div>
+                   <div class="col pt-3 col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 ">
+                       Achtung - Auch dieser Schritt kann nicht rückgängig gemacht werden.
+                   </div>
+                   <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+                       <button onclick="location.href = '{% url 'import_abbruch' %}';" type="reset"
+                               class="btn btn-outline-success expand" >Abbrechen</button>
+                   </div>
+               </div>
+            </div>
+        </form>
+        <p>&nbsp;</p>
+
+        <script type="text/javascript">
+            (function (d) {
+                d.getElementById('hochladen').onclick = function () {
+                    d.getElementById('loading2').style.display = 'block';
+                    d.getElementById('hochladen').disabled = true;
+                    document.getElementById('form2b').submit();
+                    return true;
+                };
+            }(document));
+        </script>
+	</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+-r basereq.txt
+gunicorn >= 20.0.4
+
+# Das sollte hier eigentlich mal raus, muss aber dann in den Settings ebenfalls bereinigt werden
+django-debug-toolbar >= 1.9.1

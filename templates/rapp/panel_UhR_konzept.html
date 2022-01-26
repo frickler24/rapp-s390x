@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+{ % load render_table from django_tables2 %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item"><a href="{% url 'user_rolle_af' %}">User, Rollen und Arbeitsplatzfunktionen</a></li>
+	<li class="breadcrumb-item active">Berechtigungskonzept - Rollen- und AF-Übersicht</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	User, Rollen und Arbeitsplatzfunktionen - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+	{% include 'search_few.html' %} {# Lädt die Suchleiste und die Übersicht über die gefundenen User #}
+
+	<div class="container-fluid">
+		{% if rollenMenge %}
+			<div class="col-12 mt-4">
+				{% if form.non_field_errors %}
+					<p>{{ form.non_field_errors }}</p>
+				{% endif %}
+			</div>
+			<h2>
+				{% if aftf_dict %}
+					Rollen, Arbeitsplatzfunktionen und Detailinformationen
+				{% else %}
+					Rollen und Arbeitsplatzfunktionen
+				{% endif %}
+				{{ ueberschrift }}
+			</h2>
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}episch=0"
+					   class="btn btn-outline-primary btn-sm" role="button"
+					   target="_blank">Erzeuge PDF kurz
+					</a> &nbsp;
+					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}episch=1"
+					   class="btn btn-outline-primary btn-sm" role="button"
+					   target="_blank">Erzeuge PDF mit TF-Auflösung
+					</a> &nbsp;
+					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}episch=9"
+					   class="btn btn-outline-primary btn-sm" role="button"
+						target="_blank">Erzeuge PDF episch,
+						Sie können in diesem Tab bleiben und während der Erzeugung ded PDFs weiterarbeiten)
+					</a>
+				</div>
+			</div>
+
+			<div id="accordion">
+				{% include "rapp/uhr_rollen_table.html" %}
+				{% include "rapp/uhr_aftf_table.html" %}
+				{% include "rapp/uhr_winacl_table.html" %}
+				{% include "rapp/uhr_racf_table.html" %}
+				{% include "rapp/uhr_db2_table.html" %}
+			</div>
+		{% else %}
+			<div class="col-12 mt-4">
+				Keine Rollen gefunden
+			</div>
+		{% endif %}
+	</div>
+{% endblock content %}

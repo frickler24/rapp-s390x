@@ -1,0 +1,25 @@
+        {% if form.non_field_errors %}
+            <div class="container alert-danger bp-3">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% if fehlermeldung %}
+            {% for zeile in fehlermeldung %}
+                <div class="row">
+                    <div class="form-group alert alert-danger" role="alert">
+                        {{ zeile }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if meldung %}
+            {% for zeile in meldung %}
+                <div class="row">
+                    <div class="form-group alert alert-success" role="alert">
+                        {{ zeile }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}

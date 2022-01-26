@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% load gethash %}
+{% load admin_urls %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item"><a href="{% url 'user_rolle_af' %}">User, Rollen und Arbeitsplatzfunktionen</a></li>
+	<li class="breadcrumb-item active">Ungenutzte Arbeitsplatzfunktionen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	User, Rollen und Arbeitsplatzfunktionen - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+{% include 'search_few.html' %} {# Lädt die Suchleiste und die Übersicht über die gefundenen User #}
+
+<div class="container-fluid">
+	{% if af_liste %}
+		<div class="col-4 mt-4">
+            <a href="{% url 'user_rolle_af' %}?{% for key,value in request.GET.items %}&{{ key }}={% if value == '+' %}%2B{% else %}{{ value }}{% endif %}{% endfor %}&export=1"
+                class="btn btn-outline-primary btn-sm"
+                role="button">
+                Export
+            </a>
+		</div>
+		<div class="col-12 mt-4">
+			{% if form.non_field_errors %}
+				<p>{{ form.non_field_errors }}</p>
+			{% endif %}
+			<h3>Für die Selektion ungenutzte Arbeitsplatzfunktionen in den angegebenen Rollen</h3>
+		</div>
+		<div class="col-8 mt-4">
+			<table class="table table-striped table-sm">
+				<thead>
+					<tr class="bg-primary text-left">
+						<th>Rollenname</th>
+						<th>Ungenutzte AF</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for af in af_liste %}
+						<tr id="{{ af }}">
+							<td>{% spaceless %}
+								<a target="_blank"
+								   href="{% url 'admin:index' %}rapp/tblrollen/{{ af.rollenname__rollenname|escape }}/change">
+									{% ifchanged af.rollenname__rollenname %}
+										{{ af.rollenname__rollenname }}
+									{% endifchanged %}
+								</a>{% endspaceless %}
+							</td>
+							<td>{{ af.af__af_name }}</td>
+					{% empty %}
+						<tr>
+							<td>Keine Arbeitsplatzfunktionen erkannt</td>
+						</tr>
+					{% endfor af_liste %}
+				</tbody>
+			</table>
+		</div>
+	{% else %}
+		<div class="col-12">
+			Keine AF-Liste erkannt
+		</div>
+	{% endif %}
+</div>
+{% endblock content %}

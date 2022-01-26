@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active">Liste manuell zu behandelnder Berechtigungen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Manuelle Rechte-Liste - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12 col-md-4 col-lg-3 col-xl-3" style="text-align: bottom;">
+                <h1>Manuelles</h1>
+            </div>
+            <div class="col mt-3">
+                <h5>
+                    Liste manuell zu behandelnder Berechtigungen
+                </h5>
+            </div>
+            <div class="col-3 mt-3">
+                <a href="{% url 'manuell_create' %}">
+                    Neuer Eintrag
+                    <img src="{% static 'create.png' %}" alt="Icon: Erzeuge Neuen Manuell-Eintrag" width="15" />
+                </a>
+            </div>
+        </div>
+        <div class="row mb-5 align-bottom">
+        </div>
+    </div>
+
+	{% if manuelle_berechtigung_list %}
+    <div class="container-fluid">
+        <div class="row">
+            <table class="table table-striped">
+                <thead class="thead-light">
+                        <tr>
+                            <th width="5%">Löschen</th>
+                            <th width="5%">Nummer</th>
+                            <th width="10%">Name</th>
+                            <th width="10%">Ersteller</th>
+                            <th width="10%">Verbundene AF</th>
+                            <th width="10%">Letzte Änderung</th>
+                            <th width="25%">Statischer Inhalt</th>
+                            <th width="25%">Info je Benutzer</th>
+                        </tr>
+                </thead>
+                <tbody>
+                    {% for man in manuelle_berechtigung_list %}
+                        <tr>
+                            <td align="center">
+                                <a href="{% url 'manuell_delete' man.id %}">
+                                    <img src="{% static 'icons8-müll-50.png' %}" width="25rem" />
+								</a>
+                            </td>
+                            <td align="center"><a href="{% url 'manuell_update' man.id %}">{{ man.id }}</a></td>
+                            <td> <a href="{% url 'manuell_update' man.id %}">{{ man.name }}</a></td>
+                            <td>{{ man.ersteller }}</td>
+                            <td>{{ man.verbundene_af }}</td>
+                            <td>{{ man.letzte_aenderung | date:"d. F Y" }}</td>
+                            <td>{{ man.statisch }}</td>
+                            <td>{{ man.relativ }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>Es gibt keine Teams in der Orga-Liste.</p>
+    {% endif %}
+    </div>
+
+{% endblock %}

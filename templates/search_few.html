@@ -1,0 +1,89 @@
+{% load static %}
+{% load widget_tweaks %}
+<div class="container">
+	<form method="get" action="{% url 'user_rolle_af' %}">
+		<div class="row my-0">
+			<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+				<label class="control-label" for="{{ filter.form.name.id_for_label }}">Name beginnt mit</label>
+				{% render_field filter.form.name class="form-control" %}
+			</div>
+			<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-3 col-xl-2">
+				<label class="control-label" for="{{ filter.form.orga.id_for_label }}">Team</label>
+				{% render_field filter.form.orga class="form-control" %}
+			</div>
+            {% comment %}
+			<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+				<label class="control-label" for="{{ filter.form.abteilung.id_for_label }}">Abteilung enthält</label>
+				{% render_field filter.form.abteilung class="form-control" %}
+			</div>
+            {% endcomment %}
+			<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+				<label class="control-label" for="{{ rollenfilter.form.rollenname.id_for_label }}">Rolle enthält</label>
+				{% render_field rollen_filter.form.rollenname class="form-control" %}
+			</div>
+			<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+				<label class="control-label" for="{{ filter.form.gruppe.id_for_label }}">Gruppe enthält</label>
+				{% render_field filter.form.gruppe class="form-control" %}
+			</div>
+            <div class="form-group form-group-sm col-12 col-sm-3 col-md-3 col-lg-2 col-xl-2">
+                <label class="control-label" for="pagesize">Zeilen pro Seite</label>
+                <input type="text" class="form-control" placeholder="# Zeilen/Seite"
+                       id="pagesize" name="pagesize" type="text" maxlength="5"
+                       {% if pagesize %} value="{{ pagesize }}" {% endif %} />
+            </div>
+			<div class="container">
+				<div class="row mt-0 mb-5 justify-content-lg-center">
+					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">
+						<button type="submit" class="btn btn-outline-primary btn-sm">Suche</button>
+					</div>
+					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">
+						<a href="{% url 'uhr_konzept' %}?{% for key,value in request.GET.items %}{% if key != 'episch' %}{{key}}={{value}}&{%endif%}{%endfor%}episch=0"
+							class="btn btn-outline-success btn-sm" role="button">Konzept (kurz)
+						</a>
+					</div>
+					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">
+						<a href="{% url 'uhr_konzept' %}?{% for key,value in request.GET.items %}{% if key != 'episch' %}{{key}}={{value}}&{%endif%}{%endfor%}episch=9"
+							class="btn btn-outline-warning btn-sm" role="button">Konzept (episch)
+						</a>
+					</div>
+					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">
+						<a href="{% url 'uhr_matrix' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+							class="btn btn-outline-success btn-sm" role="button">Funktionsmatrix
+						</a>
+					</div>
+					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">
+						<a href="{% url 'home' %}"
+							class="btn btn-outline-secondary btn-sm"
+							role="button">
+							Abbrechen
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		{# Ergebnis der Filterung: Liste gefundener User mit Änderungs-Button #}
+		{% for row in pages %}
+			<div class="row">
+				<div class="col-1">
+					<a href="{% url 'user_rolle_af_parm' row.pk %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}"
+						class="btn btn-outline-primary btn-sm"
+						role="button">
+						{{ row.userid|upper }}
+					</a>
+				</div>
+				<div class="col-8">
+					<a href="{% url 'user_rolle_af_parm' row.pk %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}">
+					   {{ row.name }}
+					</a>
+				</div>
+			</div>
+		{% empty %}
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+				Keine angezeigten User
+			</div>
+		{% endfor %}
+	</form>
+	{% include "paginator.html" %}
+	<div class="row mb-5"></div>
+</div>

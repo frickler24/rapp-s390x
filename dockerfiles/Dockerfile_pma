@@ -1,0 +1,7 @@
+FROM phpmyadmin/phpmyadmin
+
+RUN apk update && apk upgrade
+
+WORKDIR /www
+RUN mkdir pma && cd pma && ln -s ../* . && rm pma
+

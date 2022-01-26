@@ -1,0 +1,31 @@
+# All requirement needed for app "rapp" which is short for Rechte-APP
+
+# Step 1: Standard
+django >= 3.0.4
+
+# Step 2: Decoupling sensitive infos from GIT repo
+python-decouple >= 3.1
+
+# DB stuff
+dj-database-url >= 0.5.0
+wheel >= 0.37.0
+mysqlclient >= 1.3.13
+
+# UI
+django-bootstrap4 >= 0.0.6
+django-filter >= 2.0.0
+django-widget-tweaks >= 1.4.2
+django-tables2 >= 1.21.2
+
+# Im-/ Exports CSV/TSV
+django-import-export >= 1.1.0
+
+# Doc generation
+docutils >= 0.14
+xhtml2pdf >= 0.2.3
+tblib >= 1.3.2
+
+# MD-Editing
+django-mdeditor >= 0.1.16
+
+# Images are at ${Project}./myvenv/lib/python3.5/site-packages/django/contrib/gis/static/gis/img

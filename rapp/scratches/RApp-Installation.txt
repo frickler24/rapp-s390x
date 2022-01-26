@@ -1,0 +1,231 @@
+# Neuaufsetzen RApp
+
+## Zugang zu zLinux-Maschine organisieren
+Dabei können die ZS-Kollegen helfen, insbesonder Björn Schanz.
+Auf der Maschine muss docker funktionsfähig installiert sein.
+Dazu gibt es bereits ansible-Scripte (Marc Eichler fragen).
+Wenigstens Port 80 und 443 müssen offen sein für interne Nutzung
+(ist normalerweise immer der Fall),
+besser auch Port 8080 wegen des Testzugangs.
+
+Derzeit läuft RApp auf der `lxz0008`.
+
+## Image-Tars transportieren
+Für den Fall,
+dass nicht alle Images im Harbor oder Artifactory bereit stehen,
+müssen sie via ftp auf die zLinux-Maschine übertragen
+und dort über
+`zcat <Datei> | docker load`
+importiert werden.
+Anschließend sollte ein geeignetes Taggen des Image erfolgen
+und - nach Login im Harbor/Artifactory -
+ein Push des / der Images.
+Das korrekte Tag ist vom Harbor/Artifactory abhängig.
+
+Derzeit befinden sich auf `lxz0008` unter
+`/app/xv13254/s390x_20200406`
+die relevanten Tar-Files.
+
+## Anlegen Basis-Daten
+Ein aktuell passendes Datenverzeichnis ist abgelegt als
+`data_dir_basis_1.8.8.tar.gz`
+Das Tar beinhaltet zwar alle DBen für Django, phpmyadmin und RApp,
+hat aber nicht den aktuellen Datenbestand für RApp.
+Der kann aus dem letzten Backup ergänzt werden, siehe weiter unten.
+
+## Anlegen der Codebasis am Beispiel Version 1.8.8
+In einem bestehenden Verzeichnis wird die Codebasis
+aus `codebasis_1.8.8_mit_git.tar.gz` entpackt, der neue Pfad darunter lautet `RApp/`.
+In dem neuen Verzeichnis steht ein Makefile (ohne Erweiterung).
+In diesem Makefile müssen die Pfade auf die aktuelle Position angepasst werden,
+dazu gibt es oben einen Konfigurationsblock.
+Normalerweise müssen die Versionsnummern nicht angepasst werden.
+Auch ist das Verzeichnis, in dem das Makefile steht, standardmäßig korrekt angegeben (`$PWD`).
+
+## Starten und Initialisieren der Datenbank
+`make maria` ausführen nach Konfiguration der folgenden Werte im Makefile:
+
+Variable | Bedeutung | default-Wert
+|---|---|---|
+REPO | die ersten beiden Teile des Repositorynamens (Server / Orga) | f4s-docker.ruv.de/s390x/
+mariaversion| Versionsangabe des Maria Image |10.1.44
+datenbankverzeichnis | In welchem Verzeichnis unterhalb $HOME liegen die Daten vor mariaDB | data
+netzwerkname | Welchen Namen soll das interne Netz haben (beliebige Benennung möglich, muss nur geändert werden, wenn mehrere Netze parallel betrieben werden sollen) | testNetz
+dienstsuffix | wenn mehrere Verssionen parall betrieben werden sollen, erhalten alle Containernamen das Suffix | <leer>
+sudoNotwendig |auf manchen Maschinen in der Cloud ist docker nur mit sudo erlaubt | sudo oder Zeile auskommentieren
+
+### Laden der relevanten Daten
+Wenn Ihnen eine Backup-Datei der RApp vorliegt,
+wird sie nun in in die Datenbank geladen:
+Die Datei wird kopiert mit
+`docker cp <PFAD>/user.sql maria<SUFFIX>:/tmp/.`
+\<DATUM DES BACKUP\>, \<PFAD\> und \<SUFFIX\> müssen geeignet ersetzt werden.
+
+Anschließend Einarbeiten der Daten direkt im Container:
+```
+docker exec -it maria<SUFFIX>
+
+Im Container:
+zcat /tmp/RechteDB-<DATUM DES BACKUP>.sql.gz | mysql -pgeheim RechteDB
+```
+
+Das dauert einen Moment,
+anschließend sind die Daten auf dem Stand des Backups.
+
+## Starten des PMA (phpmyadmin)
+Die nachfolgenden Schritte sind erst sinnvoll,
+wenn die Datenbank im Container läuft.
+
+Variable | Bedeutung | default-Wert
+|---|---|---|
+pmaversion | Version des phpmyadmin | 5.0.2
+pmaport |wenn PMA direkt aufrufbar sein soll, Zeile konfigurieren, sonst auskommentieren | `--publish 8082:80`
+
+Die folgende Datei muss mit einem entsprechenden Zugriffsrecht ausgestattet sein:
+Apache / fpm greift lesend auf die Datei `$PWD/mariadbconf.d/config.inc.php` zu
+und benötigt deshalb Leserecht für die Gruppe und die Gruppeneigentümerschaft für dei Datei:
+```
+sudo chgrp 33 mariadbconf.d/config.inc.php
+chmod 750 mariadbconf.d/config.inc.php
+```
+Anschließend kann der PMA mit `make pma` gestartet werden.
+
+Wenn der pmaport definiert wurde,
+kann mit `http://<maschine>:<pmaport>`
+im Browser oder über `curl localhost:<pmaport>` kontrolliert werden,
+ob phpmyadmin läuft und auf die Datenbank zugreifen kann.
+
+**Anschließend die Konfiguration <pmaport> wieder auskommentieren,**
+sie wird nicht mehr benötigt, sobald die Proxies laufen.
+
+Für weitere Tests ist es nicht zwingend erforderlich,
+in diesem Schritt den Container zu entfernen und wieder zu starten.
+Sollte dies doch erfolgen sollen,
+geht es am einfachsten über
+`docker rm -f pma<SUFFIX> ; make pma`
+
+## Konfiguration und Start des RApp-Tests
+Die Unit-Tests der App
+sollten ohne weitere Konfiguration laufen,
+allerdings muss zu Beginn mit der korrekten Software-Version das aktuelle Image gebaut werden.
+Dazu muss die entsprechende neueste Datei
+`$HOME/tarfiles/code_s390x_<RAPPVERSION>.tar.gz` existieren.
+Es genügt eine einzige Datei in dem Verzeichnis,
+ältere oder Zwischen-Versionen werden für diesen Schritt nicht benötigt.
+\<RAPPVERSION\> muss dem \d+.\d+.\d+ Format enstsprechen.
+
+### Das App-Image
+`make image` erzeugt das Image `<REPO>rapp:<VERSION>`.
+Soll das komplette Dockerfile.rapp ausgeführt werden unter Ignorieren der vorhandenen Cache,
+lautet der Aufruf `CACHE=--no-cache make image`.
+Analog gilt diese Environment-Variable CACHE für alle Make-Aufrufe, in deren Folge das Image gebaut wird.
+Beispiel: `CACHE=--no-cache make` für den Aufbau des gesamten Stacks oder
+`CACHE=--no-cache make rapptest` für das Bauen des Image und anschließendes Ausführen der Unittests.
+
+### Die Unit-Tests
+Das eigentliche Starten des Containers aus dem frisch gebauten Image erfolgt über `make rapptest`.
+rapptest kennt keine Ports, denn die Tests laufen ausschließlich innerhalb des Terminals ab.
+Der Container beendet und entfernt sich nach Abschluss der Tests.
+
+## Die produktive App
+Die App basiert auf demselben Image wie rapptest,
+kennt aber - im Gegensatz zu rapptest - die Option,
+einen separaten Port nach außen anzubieten
+**Das sollte nur zu Testzwecken genutzt werden**.
+Ist die Zeile `rappport = --publish <PORTNUMMER>:8000` aktiv, ist die App nach Start des Containers über den angegebenen Port erreichbar.
+Ist sie auskommentiert, kann die App nur innerhalb des App-lokalen Netzwerks über Port 8000 erreicht werden.
+Dies erfolgt normalerweise über den proxy_nginx.
+
+Eine weitere Einrichtung ist das Anlegen eines Verzeichnisses
+`$PWD/staticfiles<SUFFIX>`. Dort werden die statischen Dateien nach Erzeugen des Containers abgelegt.
+Beispiel: Das SUFFIX dienstsuffix lautet "neu". Dann muss im aktuellen Projektordner ein Verzeichnis
+`staticfilesneu` angelegt und mit Schreibrechten für Gruppe 1001 versorgt werden:
+
+`mkdir -p staticfilesneu && sudo chgrp 1001 staticfilesneu && chmod 775 staticfilesneu && ls -lsd staticfilesneu`
+
+ToDo: Die Anlage des Users rapp auf eine hohe Nummer zum Vermeiden von Konflikten mit bestehenden Usern im Docker-Host
+
+Beispiel:
+```
+## Configuration:
+rappport = --publish 8083:8000
+
+## im Shell:
+mkdir -p staticfilesneu && sudo chgrp 1001 staticfilesneu && chmod 775 staticfilesneu && ls -lsd staticfilesneu
+make rapp
+
+## erster Test - Da sollte schon HTML kommen:
+curl localhost:8083
+```
+Im Browser sollte nun unter `<maschine>:8083` die Seite zu sehen sein;
+allerdings fehlen sämtliche Grafiken, CSS-Formatierungen etc.
+Das liegt daran,
+dass in der produktionsnahen Umgebung diese statischen Dateien über einen Proxy ausgeliefert werden,
+der auch gleich den TLS-Endpunkt darstellt
+(ToDo ist das so, oder macht das inzwischen der hap?).
+
+## staticfiles und TLS-Verschlüsselung (ehem. SSL)
+Für die Lieferung der Staticfiles ist der proxy zuständig (wichtig: Es wird zwischen dem Proxy und dem HAProxy unterschieden).
+Der proxy
+- behandelt Anfragen mit URL /static/ selbst, da er Zugriff auf das Verzeichnis $PWD/staticfiles hat
+- leitet Anfragen mit der URL /rapp/ oder / an den Server rapp:8000 weiter
+
+Andere Anfragen sollten gar nicht beim proxy ankommen, denn sie werden normalerweise vom haproxy umgeleitet.
+Beispiel:
+```
+## Konfiguration
+nginxversion = 1.17.9
+nginxport = --publish 8084:8000
+
+## Erzeugen des Image mit
+make -f Makefile.images proxy:nginx CACHE=--no-cache
+
+## Und Starten des Containers
+make proxy
+
+```
+
+### Der HighAvaliability-Proxy haproxy
+Als letztes wird der LoadBalancer HAProxy gestartet.
+Er ist dafür verantwortlich,
+- den einen oder mehrere parallel laufende RApp-Server
+- Die Abfrage nach LoadBalancer-Statusinformationen
+- den phpmyadmin
+- und - falls vorhanden - einen Server mit einem anderen code-Image anzusteuern.
+Darüber hinaus verfügt er über das `rapp.pem`-File zur TLS-Verschlüsselung.
+
+Im echten Produktionsbetrieb ist der HAProxy der einzige Dienst, der von außen erreichbar ist.
+Deshalb stellt er die Ports 80 und 443 zur Verfügung:
+```
+haproxyversion = 2.1.4
+http = 80
+https = 443
+```
+
+Wenn zu Testzwecken
+neben der Produktionsservern
+noch eine Testinstallation aufgebaut werden soll,
+müssen die Ports entsprechend angepasst werden.
+Die bekannten Werte 8080 und 8443 passen sicherlich gut.
+
+Start des HAProxy erfolgt mit `make hap`.
+Über `<Maschine>/stats` können die Statistiken des HAProxy beobachtet werden,
+`<Maschine>/rapp` oder `<Maschine>` führt zur App
+und über `<Maschine>/pma` oder `<Maschine>/phpmyadmin` ist der PMA adressierbar.
+
+## Aufrufmöglichkeiten für make
+
+make-Aufruf | Bedeutung
+|---|---|
+`make it`|entfernt alle vorhandenen Services und das Netzwerk.
+Das Netzwerk wird neu erzeugt und anschließend die Dienste
+maria, pma, rapp, rapptest, rapp, proxy und hap gestartet.|
+`make fast`|wie `make it`,
+aber rapptest wird nicht ausgeführt (spart Zeit)|
+`make all`|wie `make it`, aber anschließend wird ein `docker ps --no-trunc` ausgeführt|
+`make neu`|Erzeugt einen rappneu-Dienst, der auf einem neu erzeugten Image basiert.
+Der neue Service ist über Port 8080 erreichbar,
+eine entsprechende Hilfemeldung wird erzeugt.|
+`make switch`|ersetzt die vorhandene RApp-Version durch diejenige, die mit `make neu` zuletzt erzeugt worden ist.|
+`CACHE=--no-cache make ...`| übergibt die Env-Varaible an docker build als Option|
+|---|---|

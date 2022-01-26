@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:
+
+  proxy:
+    depends_on:
+      - app
+    build:
+      context: .
+      dockerfile: Dockerfile_nginx
+    image: nginx-rapp
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+    container_name: rapp_proxy
+    networks:
+      - rapp_net
+    ports:
+      - 8086:80
+    volumes:
+      - /home/lutz/Projekte/ProdRApp/RechteDB/staticfiles:/static:rw
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/rapp/"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile_gunicorn
+    image: gunicorn_rapp
+    container_name: gunirapp
+    networks:
+      rapp_net:
+        aliases:
+          - gunirapp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://gunirapp:8000/rapp/"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  rapp_net:
+

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item active">Start</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+
+  <div class="container rounded bg-light text-secondary">
+    <div class="row ">
+      <h1>Hauptseite</h1>
+    </div>
+    <div class="row ">
+        <p>Willkommen in der neuen <em>RechteApp RApp</em>,
+        der Website zur Pflege von Berechtigungsdaten
+      </p>
+    </div>
+  </div>
+
+  <div class="container rounded bg-dark">
+    <div class="row">
+      <div class="text-light col-xs-12 col-sm-8 col-md-6 col-lg 4 col-xl-4 mt-4">
+	      {% if origin %}<h5>origin-Eintrag = {{ origin }}</h5>{% endif %}
+        <h5>Statistik über die RApp-Inhalte:</h5>
+      </div>
+    </div>
+    <div class="container rounded bg-info text-light">
+      <div class="row pt-3 ">
+        <div class="col col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Status Stored Procedures:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">
+          {% if sps %}
+            <img src="{% static 'admin/img/icon-yes.svg' %}">
+          {% else %}
+            <img src="{% static 'admin/img/icon-no.svg' %}">
+          {% endif %}
+        </div>
+      </div>
+      <div class="row ">
+        <div class="col-12">
+          Stand letzte Importe:
+        </div>
+        {% for orga, datum in importliste.items %}
+          <div class="col-2 text-left bg-info">{{ orga }}</div>
+          <div class="col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 text-right bg-info">{{ datum }}</div>
+          <div class="col-xs-0 col-sm-2 col-md-4 col-lg-5 col-xl-6 text-right bg-info"></div>
+        {% endfor %}
+      </div>
+      <div class="row pt-3 ">
+        <div class="col col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Administrierte Berechtigungen:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_rights }}</div>
+      </div>
+      <div class="row">
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Aktive Rechte:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_active_rights }}</div>
+      </div>
+      <div class="row">
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Administrierte UserIDs:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_userIDs }}</div>
+      </div>
+      <div class="row">
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Aktive UserIDs:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_activeUserIDs }}</div>
+      </div>
+      <div class="row">
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          UserIDs von AI-BA:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_userIDsInDepartment }}</div>
+      </div>
+      <div class="row">
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Vorhandene Teams:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_teams }}</div>
+      </div>
+      <div class="row">
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Bekannte Plattformen:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_plattforms }}</div>
+      </div>
+      <div class="row">
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Anwender der RApp:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_users }}</div>
+      </div>
+      <div class="row">
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Aktuelle TFen in AI-BA:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_iam_ba }}</div>
+      </div>
+    </div>
+    <div class="row ">
+      <div class="text-light col-1 mt-4">
+      </div>
+    </div>
+  </div>
+{% endblock %}

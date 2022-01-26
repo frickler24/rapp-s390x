@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% load gethash %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item"><a href="{% url 'user_rolle_af' %}">User, Rollen und Arbeitsplatzfunktionen</a></li>
+	<li class="breadcrumb-item active">Rollenvarianten</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	User, Rollen und Arbeitsplatzfunktionen - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+{% include 'search_few.html' %} {# Lädt die Suchleiste und die Übersicht über die gefundenen User #}
+
+<div class="container-fluid">
+	{% if userids %}
+		<div class="col-4 mt-4">
+            <a href="{% url 'user_rolle_af' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&export=999"
+                class="btn btn-outline-primary btn-sm"
+                role="button">
+                Export
+            </a>
+		</div>
+		<div class="col-8 mt-4">
+			{% if form.non_field_errors %}
+				<p>{{ form.non_field_errors }}</p>
+			{% endif %}
+			<h3>Betrachtung von Rollenvarianten
+			</h3>
+		</div>
+		<div>
+			<table class="table table-striped table-sm">
+				<thead>
+					<tr class="bg-primary text-left">
+						<th>Name</th>
+						<th>UserID</th>
+						<th>AF</th>
+						<th>Vergebene Rollen</th>
+						<th>Mögliche weitere Rollen</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for name, uids in userids.items %}
+						{% for uid in uids %}
+							{% for af in af_per_uid|hash:uid|sort %}
+								{% if af != "ka" %}
+									<tr id="{{ uid }}.{{ af }}">
+										<td>{% ifchanged name %}{{ name|part2a }}{% endifchanged %}</td>
+										<td>{% ifchanged %}{{ uid }}{% endifchanged %}</td>
+										<td>{% ifchanged %}{{ af }}{% endifchanged %}</td>
+										<td>
+											{% if not nur_neue %}
+												{% for rolle in vorhanden|hash2:uid|hash3:af %}
+													{# Als letztes Element wird immer ein Leerstring geliefert! #}
+													{% if forloop.first and rolle == ""%}
+														<strong class="text-danger">nicht vergeben</strong>
+													{% endif %}
+													{% if not forloop.last %}
+														<a href="{% url 'user_rolle_af-delete' rolle|part1 %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+															<img src="{% static 'icons8-müll-50.png' %}" width="20rem" />
+														</a> {{ rolle|part2 }}<br />
+													{% endif %}
+												{% empty %}
+													Fehler im Datensatz
+												{% endfor vorhanden %}
+											{% else %}
+												<strong class="text-danger">nicht vergeben</strong>
+											{% endif %}
+										</td>
+										<td>
+											{% for rolle in optional|hash2:uid|hash3:af %}
+												{# Als letztes Element wird immer ein Leerstring geliefert! #}
+												{% if not forloop.last %}
+													<a href="{% url 'uhr_create' userid=uid rollenname=rolle|part1a schwerpunkt_vertretung='Schwerpunkt' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}#{{ uid }}.{{ af }}">{{ rolle }}</a><br />
+												{% endif %}
+											{% empty %}
+												Keine optionale Rolle gefunden
+											{% endfor optional %}
+										</td>
+									</tr>
+								{% endif %}
+							{% empty %}
+								<tr>
+									<td>{% ifchanged name %}{{ name|part2a }}{% endifchanged %}</td>
+									<td>{% ifchanged %}{{ uid }}{% endifchanged %}</td>
+									<td>Keine AF zugewiesen oder durch Filter ausgeblendet</td>
+								</tr>
+							{% endfor af_per_uid %}
+						{% empty %}
+							<tr>
+								<td>{% ifchanged %}{{ name }}{% endifchanged %}</td>
+								<td>Keine UserID erkannt</td>
+							</tr>
+						{% endfor uids %}
+					{% endfor items %}
+				</tbody>
+			</table>
+		</div>
+	{% else %}
+		<div class="col-12">
+			Kein User selektiert
+		</div>
+	{% endif %}
+</div>
+{% endblock content %}

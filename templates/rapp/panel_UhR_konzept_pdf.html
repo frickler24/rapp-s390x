@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+{% load gethash %}
+{% load static %}
+<html lang="de">
+    <head>
+        <link rel="stylesheet" href="static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="static/css/style.css">
+        <style>
+            @page {
+                size: A4;
+                margin: 1cm;
+                @frame footer {
+                    -pdf-frame-content: footerContent;
+                    bottom: 0cm;
+                    margin-left: 9cm;
+                    margin-right: 9cm;
+                    height: 0.7cm;
+                }
+               }
+        </style>
+    </head>
+    <body>
+        <h1>
+			{% if aftf_dict %}
+				Rollen, Arbeitsplatzfunktionen und Detailinformationen
+			{% else %}
+				Rollen und Arbeitsplatzfunktionen
+			{% endif %}
+            {{ ueberschrift }}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Stand: {% now "d.m.Y" %}
+        </h1>
+
+        {% if rollenMenge %}
+			<h2>1. Liste der Rollen und ihrer Arbeitsplatzfunktionen (AF)</h2>
+            {% for rolle in rollenMenge %}
+                <div>
+					<hr />
+                    <table repeat="0" id="RolleUndAF">
+                        <thead>
+                            <tr>
+                                <th colspan="4" style="text-align: left;"><br />Rollenname</th>
+                                <th colspan="6" style="text-align: left;"><br />Beschreibung</th>
+                                <th colspan="2" style="text-align: left;"><br />System</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td colspan="4">{{ rolle.rollenname }}</td>
+                            <td colspan="6">{{ rolle.rollenbeschreibung }}</td>
+                            <td colspan="2">{{ rolle.system }}</td>
+                        </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td colspan="11">
+                                    <table repeat="0" id="pdfdruck2">
+                                        <thead>
+                                            <tr>
+												<td width="30%"><strong>AF</strong></td>
+												<td width="10%"><strong>Muss</strong></td>
+												<td width="10%"><strong>Einsatz</strong></td>
+												<td width="10%"><strong>AF-Kritik.</strong></td>
+												<td width="40%"><strong>Anmerkung zur AF</strong></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for meineaf in rolle.tblrollehataf_set.all %}
+                                                {% if forloop.counter0 > 0 and forloop.counter0|divisibleby:45 %}
+													</tbody>
+												</table>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+								<table repeat="0" id="pdfdruck">
+									<tr>
+										<td>&nbsp;</td>
+										<td colspan="11">
+											<table repeat="1" id="pdfdruck2">
+												<thead>
+													<tr>
+														<td width="30%"><strong>AF</strong></td>
+														<td width="10%"><strong>Muss</strong></td>
+														<td width="10%"><strong>Einsatz</strong></td>
+ 			                                            <td width="10%"><strong>AF-Kritik.</strong></td>
+ 														<td width="40%"><strong>Anmerkung zur AF</strong></td>
+													</tr>
+												</thead>
+												<tbody>
+												{% endif %}
+													<tr>
+														<td>{{ meineaf.af }}</td>
+														<td class="text-center">
+															{% if meineaf.mussfeld %}
+																<img src="static/checkbox-checked.jpg"
+																	 alt="checkbox checked" height="10" width="10">
+															{% else %}
+																<img src="static/checkbox-blank.jpg"
+																	 alt="checkbox checked" height="10" width="10">
+															{% endif %}
+														</td>
+														<td>
+															<small>{{ meineaf.get_einsatz_display }}</small>
+														</td>
+														<td class="text-center">
+															<small>{{ af_kritikalitaet | strhash:meineaf.af }}</small>
+                                        				</td>
+
+														<td>{{ meineaf.bemerkung }}</td>
+													</tr>
+												{% empty %}
+													<tr>
+														<td class="text-danger">
+															Dieser Rolle sind keine Arbeitsplatzfunktionen zugeordnet
+														</td>
+													</tr>
+												{% endfor rolle.tblrollehataf_set.all %}
+											</tbody>
+										</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+			{% endfor RollenMenge %}
+			<hr />
+		{% else %}
+			<div class="text-danger">
+				<p>
+					Keine Rollen gefunden
+				</p>
+			</div>
+		{% endif %}
+
+		{% if aftf_dict %}
+			<p style="font-size: 10px; margin: 10px;"> </p>
+			<div><hr /><hr /><p style="font-size: 10px; margin: 0px;">&nbsp;</p></div>
+			<h2>2. Liste der Arbeitsplatzfunktionen und ihrer Technischen Funktionen (TF)</h2>
+			<div id="AFTF_liste">
+			   {% for af, tf_dict in aftf_dict.items %}
+					<hr />
+					<p id="AFTF_{{af}}" style="font-size: 6px; margin: 3px;">
+						{% for tf in tf_dict|dictsort:"tf" %}
+							<strong>AF: '{{ af }}'</strong>,
+							Beschr.: <strong>'{{ tf.tf_beschreibung }}'</strong>,
+							<br />
+							&nbsp; &nbsp; &nbsp;
+							TF: '{{ tf.tf }}',
+							&nbsp; &nbsp;
+							TF-Krit.: 		'{{ tf.tf_kritikalitaet }}',
+							&nbsp; &nbsp;
+							TF-Eigentümer: 	'{{ tf.tf_eigentuemer_org }}',
+							&nbsp; &nbsp;
+							Plattform: 		'{{ tf.plattform__tf_technische_plattform }}',
+							&nbsp; &nbsp;
+							Direct Connect: '{{ tf.direct_connect }}',
+							<br />
+						{% endfor tf_dict %}
+					</p>
+				{% endfor aftf_dict %}
+				<hr />
+			</div>
+		{% endif %}
+
+		{% if racf_liste %}
+			<p style="font-size: 10px; margin: 10px;"> </p>
+			<div><hr /><hr /><p style="font-size: 10px; margin: 0px;">&nbsp;</p></div>
+			<h2>3. Auflistung der RACF-Profile</h2>
+
+			<div id="AFTF_liste">
+				{% for g in racf_liste|dictsort:"group" %}
+					{% ifchanged g.group %}<hr />{% endifchanged %}
+					<p id="RACF_{{g.group}}" style="font-size: 6px; line-height: 1; margin: 0rem;">
+						<strong>Name (Group): '{{ g.group }}'</strong>,
+						&nbsp; &nbsp;
+						Klasse: {{ g.ressource_class }},
+						&nbsp; &nbsp;
+						Zugriff: {{ g.access }},
+						&nbsp; &nbsp;
+						Test: {{ g.test }},
+						&nbsp; &nbsp;
+						Produktion: {{ g.produktion }},
+						&nbsp; &nbsp;
+						Änderung: {{ g.alter_control_update }},
+						&nbsp; &nbsp;
+						Typ: '{{ g.type }}',
+						&nbsp; &nbsp;
+						<strong>Profil: '{{ g.profil }}'</strong>
+					</p>
+				{% endfor racf_liste %}
+				<hr />
+			</div>
+		{% endif %}
+
+		{% if db2_liste %}
+			<p style="font-size: 10px; margin: 10px;"> </p>
+			<div><hr /><hr /><p style="font-size: 10px; margin: 0px;">&nbsp;</p></div>
+			<p style="font-size: 10px; margin: 100px;">&nbsp;</p>
+			<h2>4. Auflistung der Db2-Grantees und zugehörender Tabellen</h2>
+
+			<div id="Db2_liste">
+				{% for grant in db2_liste %}
+					{% ifchanged grant.grantee %}<hr />{% endifchanged %}
+					<p id="RACF_{{grant.grantee}}" style="font-size: 6px; line-height: 1; margin: 0rem;">
+						<strong>Name TF (Grantee):	'{{ grant.grantee }}'</strong>,
+						&nbsp; &nbsp;
+						<strong>Umgebung: 			{{ grant.source }}</strong>,
+						&nbsp; &nbsp;
+						<strong>Tabelle: 			{{ grant.table }}</strong>,
+						&nbsp; &nbsp;
+						Creator: 					{{ grant.creator }},
+						&nbsp; &nbsp;
+						Grantor: 					{{ grant.grantor }},
+						&nbsp; &nbsp;
+						GrantedTS: 					{{ grant.grantedts }},
+						&nbsp; &nbsp;
+						{% if grant.selectauth %}SELECT={{ grant.selectauth }},{% endif %}
+						{% if grant.insertauth %}INSERT={{ grant.insertauth }},{% endif %}
+						{% if grant.updateauth %}UPDATE={{ grant.updateauth }},{% endif %}
+						{% if grant.deleteauth %}DELETE={{ grant.deleteauth }},{% endif %}
+						{% if grant.alterauth  %}ALTER={{  grant.alterauth }},{% endif %}
+						{% if grant.indexauth  %}INDEX={{  grant.indexauth }}{% endif %}
+					</p>
+				{% endfor db2_liste %}
+		{% endif %}
+
+		{% if winacl_liste %}
+			<p style="font-size: 10px; margin: 10px;"> </p>
+			<div><hr /><hr /><p style="font-size: 10px; margin: 0px;">&nbsp;</p></div>
+			<h2>5. Auflistung der zugehörenden Windows Laufwerksrechte</h2>
+
+			<div id="AFTF_liste">
+				{% for ac in winacl_liste %}
+					{% ifchanged ac.group %}<hr />{% endifchanged %}
+					<p id="WINACL_{{ac.tf}}" style="font-size: 6px; line-height: 1; margin: 0rem;">
+						<strong>Name (AD-TF): '{{ ac.tf }}'</strong>,
+						&nbsp; &nbsp;
+						Zugriff: {{ ac.zugriff }},
+						&nbsp; &nbsp;
+						Server: {{ ac.server }},
+						&nbsp; &nbsp;
+						<strong>Pfad: {{ ac.pfad }}</strong>
+					</p>
+				{% endfor winacl_liste %}
+				<hr />
+				{% if winnoe %}
+					<h3>5.1 Folgende TFen müssen in den jeweiligen Systemen nachgeschlagen werden</h3>
+					<p style="font-size: 8px; line-height: 1; margin: 0rem;">
+						{% for e in winnoe %}
+							{{ e }}
+							{% if not forloop.last %},&nbsp;{% endif %}
+						{% endfor %}
+					</p>
+				{% endif %}
+			</div>
+		{% endif %}
+
+		<div id="footerContent">
+			{% block page_foot %}
+				Page <pdf:pagenumber>
+			{% endblock %}
+		</div>
+    </body>
+</html>

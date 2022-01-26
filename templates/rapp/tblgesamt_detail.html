@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active"><a href="{% url 'gesamtliste' %}">Gesamtliste</a></li>
+    <li class="breadcrumb-item active">Detail</li>
+    {% endblock breadcrumb %}
+
+{% block title %}
+	Gesamtliste - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <h1>Technische Funktion</h1>
+    <p>TF-Detail {{tblgesamt.tf}} für User {{ tblgesamt.userid_name }}</p>
+
+    <p><strong>AF: </strong>{{ tblgesamt.enthalten_in_af }}</p>
+    <p><strong>GF: </strong>{{ tblgesamt.gf }}</p>
+    <p><strong>UserID, Name: </strong>{{ tblgesamt.userid_name }}</p>
+    <p><strong>Da fehlt noch ebbes (id): </strong> {{ tblgesamt.id }}</p>
+
+    <hr>
+    {% for user in tblgesamt.userid_name_list %}
+        <p class="text-muted"><strong>UserID | Name, Vorname</strong> {{ user.userid }} | {{ user.name }}</p>
+    {% endfor %}
+{% endblock content %}

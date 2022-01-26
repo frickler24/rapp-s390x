@@ -1,0 +1,41 @@
+{% load static %}
+{% load widget_tweaks %}
+
+{% include 'rapp/import_anleitung.html' %}
+{% include 'rapp/import_fehler.html' %}
+
+<div class="container alert-secondary py-3">
+    <h5>Auswahl der Organisation und Hochladen der Datei</h5>
+    <h6>Ein bisschen Statistik:</h6>
+    {% if statistik %}
+        {% for k, v in statistik.items %}
+            <div class="row">
+                <div class="col ml-3 col-xs-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 bg-info">
+                    {{ k }}:
+                </div>
+                <div class="col col-xs-12 col-sm-4 col-md-2 col-lg-2 col-xl-2 text-right bg-info">
+                    {{ v }}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p><strong>Oops, keine Statistik vorhanden !?!</strong></p>
+    {% endif %}
+
+    {% if laufzeiten %}
+        &nbsp;<br />
+        {% for k, v in laufzeiten.items %}
+            <div class="row">
+                <div class="col ml-3 col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 bg-info">
+                    {{ k }}:
+                </div>
+                <div class="col col-xs-12 col-sm-4 col-md-2 col-lg-2 col-xl-2 text-right bg-info">
+                    {{ v }}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p><strong>Oops, keine Zeiten vorhanden !?!</strong></p>
+    {% endif %}
+</div>
+

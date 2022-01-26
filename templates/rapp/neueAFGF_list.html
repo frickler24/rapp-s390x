@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">Suche neue AF/GF</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Filter - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+		<form method="get">
+			<div class="well">
+				<div class="form-group margin-top-3">
+					<a href="{% url 'zeige_neue_afgf' %}" class="btn btn-primary btn-sm" role="button">Suche</a>
+					<a href="{% url 'neueAFGF_download' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+						class="btn btn-outline-primary btn-sm"
+						role="button">
+						Daten herunterladen
+						{% if gesamtzahl <= 500 %}
+							<span class="badge badge-success">
+						{% elif gesamtzahl <= 2000 %}
+							<span class="badge badge-primary">
+						{% elif gesamtzahl <= 10000 %}
+							<span class="badge badge-warning">
+						{% else %}
+							<span class="badge badge-danger">
+						{% endif %}
+							{{ gesamtzahl }}</span>
+					</a>
+					<a href="{% url 'neueAFGF_setzen' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+						class="btn btn-outline-primary btn-sm"
+						role="button">
+						AF/GF-Kombinationen setzen
+						{% if AFGFzahl <= 500 %}
+							<span class="badge badge-success">
+						{% elif AFGFzahl <= 2000 %}
+							<span class="badge badge-primary">
+						{% elif AFGFzahl <= 10000 %}
+							<span class="badge badge-warning">
+						{% else %}
+							<span class="badge badge-danger">
+						{% endif %}
+							{{ AFGFzahl }}</span>
+					</a>
+					<a href="{% url 'home' %}"
+						class="btn btn-secondary btn-sm"
+						role="button">
+						Abbrechen
+					</a>
+					<p></p>
+				</div>
+			</div>
+		</form>
+	</div>
+
+    {% comment %} Die Ergebnismenge, manuell zu einer Tabelle zusammengestellt {% endcomment %}
+	<table class="table table-bordered vllzulangertext">
+		<thead>
+			<tr class="bg-primary">
+				<th>User</th>
+				<th>UserID</th>
+				<th>AF</th>
+				<th>GF</th>
+				<th>GF-Beschreibung</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in meineTabelle %}
+				<tr>
+					<td class="vllzulangertext knappeTabelle">{{ row.0 }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.1 | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.2 }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.3 }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.4 }}</td>
+				</tr>
+			{% empty %}
+				<tr>
+					<td colspan="5">Keine Treffer</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% include "paginator.html" %}
+{% endblock content %}

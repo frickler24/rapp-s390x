@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active"><a href="{% url 'userliste' %}">UserID-Liste</a></li>
+    <li class="breadcrumb-item active">UserID-Detail</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	UserID-Liste - {{ block.super }}
+{% endblock %}
+
+{% load static %}
+{% block content %}
+    <h1>
+        {% if object.name %}
+        User-Eintrag ändern für <strong>{{ object.name }}</strong>
+        {% else %}
+            Neuen User-Eintrag anlegen
+        {% endif %}
+    </h1>
+    <p>&nbsp;</p>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        </table>
+        <p>&nbsp;</p>
+        <table style="width: 50%;">
+            <tr>
+                <td>
+                    <input type="submit" value="Submit" />
+                </td>
+                {% if object.name %}
+                    <td>
+                       <a href="{{ object.get_absolute_delete_url }}" > Eintrag löschen
+                            <img src="{% static 'delete.svg' %}" width="15" />
+                        </a>
+                    </td>
+                {% endif %}
+                <td>
+                    <a href="{% url 'userliste' %}">Bearbeitung abbrechen!</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+{% endblock content %}

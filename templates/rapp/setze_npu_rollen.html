@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">Automatisches Versorgen aller NPU mit dedizierten Rollen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	NPU mit Rollen versorgen - {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+	<div class="container">
+        {% if form.non_field_errors %}
+            <div class="container alert-danger bp-3">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% if fehlermeldung %}
+            {% for zeile in fehlermeldung %}
+                <div class="row">
+                    <div class="form-group alert alert-danger" role="alert">
+                        {{ zeile }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form id = "form" action="" method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="container alert-normal">
+                <div class="row">
+                    <div class="form-group col-12">
+                        <p>
+                            Diese Funktion ermittelt für jeden NPU,
+                            ob er bereits über eine Rolle verfügt, die seinem Namen entspricht.
+                        </p>
+                        <p>
+                            Sollte dies nicht der Fall sein, so wird eine neue Rolle mit seinem Namen erzeugt
+                            und es werden alle aktuell vergebenen AFen der Rolle hinzugefügt.
+                        </p>
+                        <p>
+                            Anschließend - oder wenn die Rolle bereits existierte, aber noch nicht zugewiesen war -
+                            wird dem NPU seine dedizierte Rolle zugewiesen.
+                        </p>
+                        <p>Der Vorgang dauert einige Sekunden.</p>
+                    </div>
+                </div>
+
+                {% if meldung %}
+                    <div>
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr class="bg-primary text-left">
+                                    <th>Anzeige</th>
+                                    <th>Wert</th>
+                                    <th>Zeitstempel</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in meldung %}
+                                    <tr>
+                                        <td>
+                                            {{ m.anzeige }}
+                                        </td>
+                                        <td class="text-right">
+                                            {{ m.wert }}
+                                        </td>
+                                        <td>
+                                            {{ m.stamp }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="form-group col-12">
+                        <button class="btn btn-success" type="submit">
+                            Erzeugen der Rollen</button>
+                        <a href="{% url 'home' %}"
+                            class="btn btn-primary"
+                            role="button">
+                            Zurück zur Übersicht
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

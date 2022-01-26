@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active">Gesamtliste</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Gesamtliste - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Gesamtliste</h1>
+        <h5>Ungefiltert mit allen aktiven und gelöschten Rechten jedes Users</h5>
+
+        {% if tblgesamt_list %}
+            <table class="table">
+                <thead class="thead-dark">
+                    <th>TF</th>
+                    <th>AF</th>
+                    <th>GF</th>
+                    <th>UserID, Name</th>
+                    <th>weiteres</th>
+                </thead>
+                <tbody>
+                    {% for recht in tblgesamt_list %}
+                        <tr>
+                            <td> <a href="{{ recht.get_absolute_url }}">{{ recht.tf }} </a> </td>
+                            <td>{{recht.enthalten_in_af}}</td>
+                            <td>{{recht.gf}}</td>
+                            <td>{{recht.userid_name}}</td>
+                            <td>leer</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if is_paginated %}
+            {# ToDo Entfernen der alten, zu einfachen Paginierung #}
+
+                <div class="pagination">
+                    <span class="page-links">
+                        {% if page_obj.has_previous %}
+                            <a href="/cars?page={{ page_obj.previous_page_number }}">previous</a>
+                        {% endif %}
+                        <span class="page-current">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                        </span>
+                        {% if page_obj.has_next %}
+                            <a href="/cars?page={{ page_obj.next_page_number }}">next</a>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endif %}
+        {% else %}
+            <p>Es gibt keine Rechte in der Gesamtliste.</p>
+        {% endif %}
+    </div>
+{% endblock content %}

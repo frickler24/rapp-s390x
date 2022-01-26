@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'manuell_liste' %}">Manuelles</a></li>
+    <li class="breadcrumb-item active">Manuell zu behandelnde Berechtigung ändern</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Manuelle Rechte - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12" style="text-align: bottom;">
+                <h3>Manuell zu behandelnde Berechtigungen anpassen</h3>
+            </div>
+        </div>
+        <div class="row mb-5 align-bottom">
+        </div>
+    </div>
+
+    <div class="container">
+        {{ form.non_field_errors }}
+    </div>
+    <form method = "post" action = "./">
+        {% csrf_token%}
+
+        {# Leider muss mman das hier einzeln machen, denn geschachtelte {%-Ausdrücke gibt es wohl nicht #}
+        <div class="container">
+            <div class="row justify-content-lg-center">
+                 <div class="form-group form-group-sm col ">
+                    <label class="control-label" for="form.name">{{ form.name.label }}</label>
+                    {{ form.name }}
+                     {% if form.name.errors %}
+                        <ol>
+                        {% for error in form.name.errors %}
+                            <li><strong>{{ error|escape }}</strong></li>
+                        {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
+                <div class="form-group form-group-sm col ">
+                    <label class="control-label" for="form.ersteller">{{ form.ersteller.label }}</label>
+                    {{ form.ersteller }}
+                     {% if form.ersteller.errors %}
+                        <ol>
+                        {% for error in form.ersteller.errors %}
+                            <li><strong>{{ error|escape }}</strong></li>
+                        {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
+                <div class="form-group form-group-sm col ">
+                    <label class="control-label" for="form.verbundene_af">{{ form.verbundene_af.label }}</label>
+                    {{ form.verbundene_af }}
+                     {% if form.verbundene_af.errors %}
+                        <ol>
+                        {% for error in form.verbundene_af.errors %}
+                            <li><strong>{{ error|escape }}</strong></li>
+                        {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
+                <div class="form-group form-group-sm col ">
+                    <label class="control-label" for="form.letzte_aenderung">Letzte Änderung</label>
+                    {{ form.letzte_aenderung }}
+                     {% if form.letzte_aenderung.errors %}
+                        <ol>
+                        {% for error in form.letzte_aenderung.errors %}
+                            <li style="color: red;">{{ error|escape }}</li>
+                        {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {{ form.media }} {# Die Textfenster, immer erst das Ausgabefenster, dann das Eingabefenster #}
+        {{ form.statisch }} {# Ansonsten funktioniert die Sprachumstellung über settings.py nicht #}
+
+        {{ form.media }}
+        {{ form.relativ }}
+
+         <table style="width: 50%; align=center;">
+            <tr>
+                <td width="25%" align="center">
+                    <input type="submit" value="Abschicken" class="btn btn-success btn-sm" />
+                </td>
+                <td width="25%" align="center">
+                    <a href="{% url 'manuell_liste' %}{{ request.GET.user }}?{% for key,value in request.GET.items %}{%if key != 'user' %}&{{ key }}={{ value }}{%endif %}{%endfor %}">
+                        <button class="btn btn-primary btn-sm" type="button">
+                            Bitte abbrechen!
+                        </button>
+                    </a>
+                </td>
+            </tr>
+        </table>
+     </form>
+    <p>&nbsp;</p>
+{% endblock %}

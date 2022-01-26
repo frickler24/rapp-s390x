@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active"><a href="{% url 'teamliste' %}">Team-Liste</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'team-update' tblorga.id %}">Team-Detail</a></li>
+    <li class="breadcrumb-item active">Team löschen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Team-Liste - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <h1>Team-Eintrag aus tblOrga löschen</h1>
+    <p>Sie löschen gerade den folgenden User-Eintrag: {{ object }}?</p>
+
+    <form action="" method="POST">
+        {% csrf_token %}
+        <input type="submit" action="" value="Ja, bitte löschen." />
+        <div><p>&nbsp;</p><a href="{% url 'teamliste' %}">Nein, abbrechen!</a></div>
+    </form>
+{% endblock content %}

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="de">
+	<head>
+		<meta charset="utf-8">
+		<title>{% block title %}RechteDB für ZI-AI-BA{% endblock %}</title>
+ 		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+		<link rel="stylesheet" href="{% static 'css/style.css' %}">
+		<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}" />
+		<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+
+	</head>
+	<body>
+		<nav class="navbar sticky-top navbar-expand-lg navbar-expand-xl navbar-dark bg-primary">
+			<a class="navbar-brand" href="{% url 'home' %}">
+				<img src="{% static 'RechteDB-Logo.png' %}" height="40rem">
+			</a>
+			<div>
+				<small>
+					<a href="https://github.com/frickler24/RechteDB" target="_blank" style="color: rgba(255,255,255,.75);">
+						Version
+						{% if request.session.version %}{{ request.session.version }}
+						{% else %}<small style="color: red;">nicht in der Session</small>
+						{% endif %}
+					</a>
+					&nbsp; | &nbsp;
+					<a
+						{% if request.user.is_authenticated %}
+							href={% url 'logout' %}?next={% url 'home' %} style="color: rgba(255,255,255,.75);">
+							Benutzer
+							{% if request.user %}{{ request.user }}
+							{% else %}<small style="color: red;">Merkwürdig!</small>
+							{% endif %}
+						{% else %}
+							href="{% url 'login' %}?next={{ request.path | urlencode }}"
+								style="color: rgba(255,255,255,.75);">
+							Benutzer unbekannt
+						{% endif %}
+					</a>
+					<br />
+					<a href="https://github.com/frickler24/RechteDB/wiki/Versionshistorie"
+											   target="_blank"
+											   style="color: rgba(255,255,255,.75);">Release-Information
+					</a>
+					&nbsp; | &nbsp;
+					<a href="{{ request.host }}/stats"
+											   target="_blank"
+											   style="color: rgba(255,255,255,.75);">Proxy-Status
+					</a>
+					&nbsp; | &nbsp;
+					<a href="{{ request.host }}/pma"
+											   target="_blank"
+											   style="color: rgba(255,255,255,.75);">PMA
+					</a>
+				</small>
+			</div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+					data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
+					aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+					<ul class="navbar-nav">
+						<li class="nav-item">
+							<a class="nav-item nav-link" <a href="{% url 'home' %}">Startseite</a>
+						</li>
+						<li class="nav-item">
+						  	<a class="nav-item nav-link"
+								href="{% url 'panel' %}?geloescht=3&userid_name__geloescht=3&userid_name__zi_organisation=ai-ba">Suche</a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-item nav-link" href="{% url 'user_rolle_af' %}">User und Rollen</a>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLists" role="button"
+							   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Listen</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdownLists">
+								<a class="dropdown-item" href="{% url 'manuell_liste' %}">Manuelle Rechte</a>
+								<a class="dropdown-item" href="{% url 'userliste' %}">UserID-Liste</a>
+								<a class="dropdown-item" href="{% url 'teamliste' %}">Team-Liste</a>
+								<a class="dropdown-item" href="{% url 'ungenutzteTeams' %}">Ungenutzte Teams</a>
+								<a class="dropdown-item" href="{% url 'ungenutzte_rollen' %}">Ungenutzte Rollen</a>
+								<a class="dropdown-item" href="{% url 'ungenutzte_afgf' %}">Ungenutzte AF/GF</a>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMagic" role="button"
+							   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Magie</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdownMagic">
+								<a class="dropdown-item" href="{% url 'import' %}">Import IIQ-Daten</a>
+			                    <a class="dropdown-item" href="{% url 'zeige_neue_afgf' %}">Neue AF/GF</a>
+			                    <a class="dropdown-item" href="{% url 'setze_NPU_rollen' %}">NPU-Rollen generieren</a>
+			                    <a class="dropdown-item" href="{% url 'muss_kann_liste' %}">Muss-/Kann-Liste erzeugen</a>
+			                    <a class="dropdown-item" href="{% url 'rolle_umbenennen' %}">Rolle umbenennen</a>
+                                <hr />
+			                    <a class="dropdown-item" href="{% url 'stored_procedures' %}">DB Aufsetzen</a>
+			                    <!-- <a class="dropdown-item" href="{% url 'magic_click' %}">Neue Funktion</a> -->
+			                    {% comment %}<a class="dropdown-item" href="{% url 'rolle_kopieren' %}">Rolle kopieren</a>{% endcomment %}
+								<a class="dropdown-item" href="{% url 'serienbrief' %}">Serienbrief</a>
+								<a class="dropdown-item" href="{% url 'einzelbrief' %}">Einzelbrief-ZIP</a>
+							</div>
+						</li>
+						<li class="nav-item">
+		                    <a class="nav-item nav-link" target="_blank" href="/admin">Admin-Sichten</a>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownHilfe" role="button"
+							   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Hilfe</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdownHilfe">
+								<a class="dropdown-item"  target="_blank"
+									href="https://themen.ruv.de/sites/01000010/Gesch%C3%BCtzte%20Inhalte/_layouts/15/WopiFrame.aspx?sourcedoc=/sites/01000010/Gesch%C3%BCtzte%20Inhalte/Lists/Dokumente%20Geschtzte%20Inhalte/Attachments/14/Berechtigungsanwendung%20RApp.docx&action=default">
+									Handbuch</a>
+								<a class="dropdown-item"  target="_blank"
+									href="https://themen.ruv.de/sites/01000010/Gesch%C3%BCtzte%20Inhalte/_layouts/15/WopiFrame.aspx?sourcedoc=/sites/01000010/Gesch%C3%BCtzte%20Inhalte/Lists/Dokumente%20Geschtzte%20Inhalte/Attachments/17/FAQ%20RApp.docx&action=default">
+									FAQ</a>
+							</div>
+						</li>
+						<li class="nav-item">
+		                    <a class="nav-item nav-link" href=#>&nbsp;</a>
+						</li>
+					</ul>
+                </div>
+            </div>
+		</nav>
+
+		<div class="container-fluid">
+			<ol class="breadcrumb my-4">
+				{% block breadcrumb %}
+				{% endblock %}
+			</ol>
+			{% block content %}
+			{% endblock %}
+		</div>
+
+		<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+		<script src="{% static 'js/popper.min.js' %}"></script>
+		<script src="{% static 'js/bootstrap.min.js' %}"></script>
+		{% block script %}
+			<!-- Tiny script for pagination in filtered views (https://djangopy.org/how-to/pagination-with-django/) -->
+			<script>
+			$(document).ready(function(){
+
+			var skip_pages = 5; //change your number accordingly you want to show numbers
+
+			var total_pages = {{pages.paginator.num_pages}};
+			var current_page = {{pages.number}};
+			var factor = Math.floor(current_page/skip_pages);
+
+			$(".page_number").each(function(i, obj) {   //Showing the discrete numbers
+			var page = factor*(skip_pages) + i + 1;
+			if(current_page%skip_pages == 0)
+			page = (factor-1)*skip_pages + i + 1;
+			if(page - 1 < total_pages){
+			$(this).html(page);
+			existing = $(this).attr("href");
+			$(this).attr("href", "?page=" + page + existing);
+			}
+			else{
+			var x = i+1;
+			$('li[data=' + x + ']').css("display", "none");
+			}
+			});
+			var page = current_page%skip_pages;
+			if(page == 0)
+			page = skip_pages;
+			$('li[data=' + page + ']').each(function(){   //Deciding the active class
+			$('li[data=' + page + ']').addClass("active");
+			});
+
+			$(".skip_next").click(function(){   //Skip next ... Function
+			if(current_page%skip_pages == 0)
+			factor = factor-1;
+			var page = (factor+1)*skip_pages + 1;
+			existing = $(this).attr("href");
+			if(page < total_pages)
+			$(this).attr("href", "?page=" + page + existing);
+			else
+			$(this).attr("href", "?page=" + total_pages + existing);
+			})
+			$(".skip_prev").click(function(){ //Skip Previous ... Function
+			if(current_page%skip_pages == 0)
+			factor = factor-1;
+			var page = skip_pages*(factor-1) + 1;
+			existing = $(this).attr("href");
+			if(page > 0)
+			$(this).attr("href", "?page=" + page + existing);
+			else
+			$(this).attr("href", "?page=" + "1" + existing);
+			})
+			});
+			</script>
+		{% endblock script %}
+	</body>
+</html>
+
+

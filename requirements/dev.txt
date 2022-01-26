@@ -1,0 +1,4 @@
+-r basereq.txt
+
+# Just for dev environment
+django-debug-toolbar >= 1.9.1

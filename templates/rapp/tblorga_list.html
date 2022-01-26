@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active">Team-Liste</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Team-Liste - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-md-4 col-lg-3 col-xl-3" style="text-align: bottom;">
+                <h1>Team-Liste</h1>
+            </div>
+            <div class="col mt-3">
+                <h5>
+                    Auflistung der definierten Teams, alphabetisch sortiert
+                </h5>
+            </div>
+            <div class="col-3 mt-3">
+                <a href="{% url 'team-create' %}">
+                    Neuer Eintrag
+                    <img src="{% static 'create.png' %}" alt="Icon: Erzeuge Neuen User-Eintrag" width="15" />
+                </a>
+            </div>
+        </div>
+        <div class="row mb-5 align-bottom">
+        </div>
+    </div>
+
+	{% if tblorga_list %}
+    <div class="container">
+        <div class="row">
+            <table class="table table-striped">
+                <thead class="thead-light">
+                        <tr>
+                            <th>Team</th>
+                            <th>Optional Team-Liste</th>
+                            <th>Optional Freies Team</th>
+                            <th>Definiert durch </th>
+                        </tr>
+                </thead>
+                <tbody>
+                    {% for team in tblorga_list %}
+                        <tr>
+                            <td> <a href="{{ team.get_absolute_update_url }}">{{ team.team }} </a> </td>
+                            <td>{{ team.teamliste }}</td>
+                            <td>{{ team.freies_team }}</td>
+                            <td>{{ team.themeneigentuemer }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Es gibt keine Teams in der Orga-Liste.</p>
+        {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

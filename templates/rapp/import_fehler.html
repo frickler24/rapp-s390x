@@ -1,0 +1,13 @@
+{% if form.non_field_errors %}
+    <div class="container alert-danger bp-3">
+        {{ form.non_field_errors }}
+    </div>
+{% endif %}
+{% if fehler %}
+    <div class="container bg-danger py-3 mt-1">
+        ACHTUNG! <br />
+        Aufruf einer Stored Procedure lieferte folgende Meldung:<br />
+        {{ fehler }}
+    </div>
+    <p>&nbsp;</p>
+{% endif %}

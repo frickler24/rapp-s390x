@@ -1,0 +1,12 @@
+# REPOSITORY   TAG             IMAGE ID       CREATED        SIZE
+# rapp         latest          7ef60bac2519   21 hours ago   1.08GB
+# python       3.9.10-buster   05251d46e385   6 days ago     838MB Das hier nicht!
+# haproxy      latest          2b6f270e43a9   13 days ago    99.2MB
+# mariadb      10.7            ae1e5a237e06   2 weeks ago    409MB
+# phpmyadmin   5               5a6be71d0ff4   5 weeks ago    465MB
+
+docker image save 7ef60bac2519 | gzip -9 > rapp_1.16.0.tar.gz
+docker image save 2b6f270e43a9 | gzip -9 > haproxy_latest.tar.gz
+docker image save ae1e5a237e06 | gzip -9 > mariadb_10.7.tar.gz
+docker image save 5a6be71d0ff4 | gzip -9 > phpmyadmin_5.1.1.tar.gz
+

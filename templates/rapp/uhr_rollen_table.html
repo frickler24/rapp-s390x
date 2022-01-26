@@ -1,0 +1,75 @@
+{% load gethash %}
+{% load static %}
+<div class="card">
+    <div class="card-header" id="headingOne">
+        <h5 class="mb-0">
+            <button class="btn btn-primary"
+                    data-toggle="collapse"
+                    data-target="#collapseOne"
+                    aria-expanded="true"
+                    aria-controls="collapseOne">
+                Rollen und Arbeitsplatzfunktionen
+            </button>
+        </h5>
+    </div>
+
+    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+        <div class="card-body">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr class="bg-primary text-left">
+                        <th colspan="3">Rollenname</th>
+                        <th colspan="1">Beschreibung</th>
+                        <th colspan="1">System</th>
+                    </tr>
+                    <tr my-0 py-0> {# Erzeuge die Tabelle mit 5 Spalten, damit wir nachher geschachtelte Sichten erhalten #}
+                        <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rolle in rollenMenge %}
+                        <tr>
+                            <td colspan="3">{{ rolle.rollenname }}</td>
+                            <td>{{ rolle.rollenbeschreibung }}</td>
+                            <td>{{ rolle.system }}</td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td colspan="4">
+                                <div class="row">
+                                    <div class="form-control bg-light text-success col-4">AF</div>
+                                    <div class="form-control bg-light text-success col-1 text-center">Muss</div>
+                                    <div class="form-control bg-light text-success col-1 text-center">Einsatz</div>
+                                    <div class="form-control bg-light text-success col-1 text-center">AF-Kritikalität</div>
+                                    <div class="form-control bg-light text-success col-5">Anmerkung zur AF</div>
+                                    {% for meineaf in rolle.tblrollehataf_set.all %}
+                                        <div class="form-control col-4">{{ meineaf.af }}</div>
+                                        <div class="form-control col-1 text-center">
+                                            {% if meineaf.mussfeld %}
+                                                <img src="{% static 'checkbox-checked.png' %}"
+                                                     alt="checkbox checked" height="15" width="15">
+                                            {% else %}
+                                                <img src="{% static 'checkbox-blank.png' %}"
+                                                     alt="checkbox checked" height="15" width="15">
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-control select col-1 text-center">
+                                            <small>{{ meineaf.get_einsatz_display }}</small>
+                                        </div>
+                                        <div class="form-control select col-1 text-center">
+                                            {{ af_kritikalitaet | strhash:meineaf.af }}
+                                        </div>
+                                        <div class="form-control col-5">{{ meineaf.bemerkung }}</div>
+                                    {% empty %}
+                                        <div class="form-control text-danger col-12">Rolle ist keine AF zugeordnet</div>
+                                    {% endfor rolle.tblrollehataf_set.all %}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr><td>&nbsp;</td></tr>
+                    {% endfor rollenMenge %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

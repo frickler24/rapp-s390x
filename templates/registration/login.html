@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Anmeldung{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item active">Start</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+  <div class="container">
+    <div class="row"
+         style="background:transparent url('/static/login_screen.png') no-repeat center center /cover">
+            <div class="col col-3">
+                <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+                <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+                <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+                <p>&nbsp;</p><p>&nbsp;</p>
+            </div>
+            <div class="col col-1">
+                <p>&nbsp;</p>
+            </div>
+            <div class="col col-3 mt-5 ml-4">
+                <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+                {% if form.errors %}
+                    <p class=" alert alert-danger">
+                        Benutzerkennung und Kennwort passen nicht zusammen.
+                    </p>
+                {% endif %}
+                {% if next %}
+                    {% if user.is_authenticated %}
+                        <p class="alert alert-danger">Ihr Konto hat keine Zugriffsberechtigung für diese Seite.
+                            Bitte wenden Sie sich an Ihren Administrator für die Anwendung.</p>
+                    {% else %}
+                        {% if not form.errors %}
+                            <p>
+                                <div class="d-block p-2 bg-dark text-white text-center" style="font-size: 2rem;">Login</div>
+                            </p>
+                            <p>&nbsp;</p>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+
+               <form id="login-form" method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <table class="table table-borderless">
+                        <tr>
+                            <td>Name</td>
+                            <td><input id="id_username" name="username"
+                                       type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>Kennwort</td>
+                            <td><input id="id_password" name="password"
+                                       type="password" class="form-control"></td>
+                        </tr>
+                    </table>
+                    <input type="submit" value="Anmelden"
+                           class="btn btn-primary btn-block mt-5" />
+                    <input type="hidden" name="next" value="{{ next }}" />
+                </form>
+
+            </div>
+
+      </div>
+    </div>
+  </div>
+
+
+{% endblock content %}

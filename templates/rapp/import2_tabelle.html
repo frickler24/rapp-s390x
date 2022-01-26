@@ -1,0 +1,44 @@
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                            <th scope="col">neu/alt</th>
+                                <th scope="col">UserID</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Team-#</th>
+                                <th scope="col">Orga</th>
+                                <th scope="col">Abteilung</th>
+                                <th scope="col">Gruppe</th>
+                                <th scope="col">NPU-Rolle</th>
+                                <th scope="col">NPU-Grund</th>
+
+                                <th scope="col">gelöscht</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in request.session.neueUser %}
+                                <tr><td><strong>neu</strong></td>
+                                    {% for elem in user %}
+                                        {% if forloop.counter == 9 %}
+                                            {# nach den ersten acht Elementen kommt ein Umbruch #}
+                                            <td>&nbsp;</td></tr><tr><td>alt</td>
+                                        {% endif %}
+                                        <td>{% if forloop.counter < 9 %}<strong>{% endif %}
+                                            {% if links != 0 and forloop.counter < 9%}
+                                                <a href="/adminrapp/tbluseridundname?userid={{ user.0 }}" target="_blank">
+                                                {{ elem }}
+                                                </a>
+                                            {% else %}
+                                                {# Das liest sich ein bisschen blöd, #}
+                                                {# aber Klammerung in Temmplates gehen nicht wirklich gut #}
+                                                {% if forloop.counter >= 9 and forloop.counter <= 10 and user.1 != user.9 %}
+                                                    <div class="text-danger font-weight-bold">{{ elem }}</div>
+                                                {% else %}
+                                                    {{ elem }}
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor neueUser %}
+                        </tbody>
+                    </table>

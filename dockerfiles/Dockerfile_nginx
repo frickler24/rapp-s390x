@@ -1,0 +1,6 @@
+FROM nginx:latest
+RUN apt-get update && apt-get upgrade -y && apt-get install -y curl vim net-tools nmap iputils* 
+
+RUN rm -f /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.not_used
+COPY nginx_rapp /etc/nginx/conf.d/rapp.conf
+

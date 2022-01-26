@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">Import neuer Daten</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Import neuer Daten - {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+	<div class="container">
+        {% include 'rapp/import_anleitung.html' %}
+
+        {% if form.non_field_errors %}
+            <div class="container alert-danger bp-3">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form id="form" action="" method="post" name="import" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <ol class="container alert-primary py-3">
+                <h4>Auswahl der Organisation und Hochladen der Datei</h4><hr />
+                    <p>Laden Sie die täglich neu erzeugten Berichtsergebnise für Ihre Organisation
+                        aus IIQ in den Downloads-Ordner:<p>
+                    <ol>
+                        <li>Vor dem Import müssen die bekannten Schwächen dieser Datei behoben werden,
+                    dazu gibt es Konvertierungs-Tool:</li>
+                        <ol>
+                            <li>
+                                Nutzen des Konvertierungs-Tools
+                                <ol>
+                                <li>Bitte laden Sie einmalig die beiden Dateien in Ihren Downloads-Ordner,
+                                    die unter
+					<a href="\\RUV.DE\ORG\ZI\10_ZIAI\70_A2\04_Intern\TF-Zertifizierung\Tools"
+					   >O:\10_ZIAI\70_A2\04_Intern\TF-Zertifizierung\Tools</a>
+					liegen</li>
+                                <li>Starten Sie in Ihrem Downloads-Ordner die Datei "konvertiere.bat"</li>
+                                </ol>
+                            </li>
+                        </ol>
+                        <li>Wählen Sie Ihre Organisation"</li>
+                        <li>Wählen Sie die so erzeugte Datei unten über "Durchsuchen..."</li>
+                        <li>Selektieren Sie, ob beim Import gleich die Gruppenzugehörigkeiten
+                            gefundener Identitäten angepasst werden sollen</li>
+                    </ol><hr />
+   				<div class="form-group form-group-sm col-12">
+                    {% for field in form %}
+                        {% if field.name == 'update_gruppe' %}
+                            <div class="form-check col-2 ">
+                        {% else %}
+                            <div class="form-check col-12 ">
+                        {% endif %}
+                            {{ field.label_tag }}
+
+                            {% if form.is_bound %}
+                                {% if field.errors %}
+                                    {% render_field field class="form-control is-invalid" %}
+                                    {% for error in field.errors %}
+                                        <div class="invalid-feedback">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {% render_field field class="form-control is-valid" %}
+                                {% endif %}
+                            {% else %}
+                                {% render_field field class="form-control" %}
+                            {% endif %}
+
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">
+                                    {{ field.help_text }}
+                                </small>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="container bg-light py-3 mt-3">
+                <div class="row my-3" id="loading2" style="display:none;">
+                    <img src="{% static 'loading.gif' %}" alt="Lade..." />
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progressbar"
+                             {% if proz > 0 %}
+                                 aria-valuenow="{{ proz }}"
+                                 style="width: {{ proz }}%;">{{ proz }}%
+                             {% else %}
+                                 aria-valuenow="0"
+                                 style="width: 1%;">0%
+                             {% endif %}
+                        </div>
+                    </div>
+
+                    {% comment %}
+                    <iframe width="1000" height="20"
+                            style="border: 0; margin-top: 1rem; color: green;"
+                            id="FrameID" src="{% url 'import_status' %}">
+                    </iframe>
+                    {% endcomment %}
+                </div>
+
+                <button class="btn btn-outline-success mt-3" type="submit" name="hochladen" id="hochladen"
+                        value="submit">Hochladen
+                </button>
+            </div>
+        </form>
+        <script type="text/javascript">
+            (function (d) {
+                d.getElementById('hochladen').onclick = function () {
+                    d.getElementById('loading2').style.display = 'block';
+                    d.getElementById('hochladen').disabled = true;
+                    function timeout() {
+                        t = setTimeout (function() {
+                            $.ajax({
+                                url: "{% url 'import_status' %}",
+                                error: function () { console.log('Da hat was nicht gefunzt'); },
+                                success: function (data) {
+                                    console.log(data);
+                                    console.log(JSON.parse(data).proz);
+                                    document.getElementById('progressbar').setAttribute("aria-valuenow",
+                                        JSON.parse(data).proz);
+                                    document.getElementById('progressbar')
+                                        .setAttribute("style", "width:" + JSON.parse(data).proz + "%;");
+                                    document.getElementById('progressbar')
+                                        .innerHTML = JSON.parse(data).proz + "%;";
+                                }
+                            });
+                            timeout();
+                        }, 1000);
+                    }
+                    timeout();
+                    document.getElementById('form').submit();
+                    return true;
+                    };
+                console.log('Function d initialisiert')
+                return true;
+            }(document));
+        </script>
+	</div>
+{% endblock %}

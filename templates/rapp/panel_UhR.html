@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% load gethash %}
+
+{% load static %}
+{% load widget_tweaks %}
+{ % load render_table from django_tables2 %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">User, Rollen und Arbeitsplatzfunktionen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	User, Rollen und Arbeitsplatzfunktionen - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+	{% include 'search_few.html' %} {# Lädt die Suchleiste und die Übersicht über die gefundenen User #}
+
+	<div class="container-fluid">
+		{% if userHatRolle_liste %}
+			<div class="col-12 mt-4">
+				{% if form.non_field_errors %}
+					<p>{{ form.non_field_errors }}</p>
+				{% endif %}
+				<div class="row">
+					<div class="col-1">
+						<a href="{% url 'user_rolle_af_export' id %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}"
+							class="btn btn-outline-primary btn-sm"
+							role="button">
+							Export
+						</a>
+					</div>
+					<div class="col-11">
+						<h3>Rollen von {{ selektierter_name }}
+
+							({{ userHatRolle_liste.count }} {% if userHatRolle_liste.count == 1 %}Rolle,
+							{% else %}Rollen,
+							{% endif %}
+							UserID-Liste =
+							{% for x in selektierte_userids %}
+								{% if forloop.last %}
+									{{ x }})
+								{% else %}
+									{{ x }},
+								{% endif %}
+							{% endfor %}
+						</h3>
+					</div>
+				</div>
+			<div>
+				<table class="table table-striped table-sm">
+				<thead>
+					<tr class="bg-primary text-left">
+						<th>
+							<div class="text-left">
+								<a href="{% url 'user_rolle_af-create' selektierte_userid %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+									<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25 rem" />
+								</a>
+								&nbsp;
+								<button class="btn btn-outline-important btn-sm" type="button"
+										data-toggle="collapse"
+										aria-expanded="false"
+										data-target=".multi-collapse"
+										aria-controls="
+										  {% for rolle in userHatRolle_liste %} rolle_{{ rolle }} {% endfor %}"
+								 >ID
+								</button>
+							</div>
+						</th>
+						<th>Rollenname</th>
+						<th>Zweck</th>
+						<th>Schwerpunkt/Vertretung</th>
+						<th>System</th>
+						<th>Zuordnung ab</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for rolle in userHatRolle_liste %}
+						<tr>
+							<td width="10%" class="text-left">
+								<a href="{{ rolle.get_absolute_delete_url }}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+									<img src="{% static 'icons8-müll-50.png' %}" width="25rem" />
+								</a>
+								<button class="btn btn-outline-primary btn-sm" type="button"
+										data-toggle="collapse" data-target="#rolle_{{ rolle }}"
+										aria-expanded="false" aria-controls="rolle_{{ rolle }}">
+									{{ rolle }}
+								</button>
+								<a target="_blank"
+										href="/adminrapp/tbluserhatrolle/{{ rolle }}/change/?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+									<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25rem" />
+								</a>
+							</td>
+							<td>
+								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
+									   placeholder="Rollenname" readonly="readonly"
+									   id="id_rollenname" name="rollenname" maxlength="100"
+									   value="{{ rolle.rollenname }}" />
+							</td>
+							<td>
+								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
+									   placeholder="Bemerkung" readonly="readonly"
+									   id="id_bemerkung" name="bemerkung" maxlength="100"
+									   value="{{ rolle.bemerkung }}" />
+							</td>
+							<td>
+								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
+									   placeholder="Bemerkung" readonly="readonly"
+									   id="id_schwerpunkt_vertretung" name="schwerpunkt_vertretung" maxlength="50"
+									   value="{{ rolle.schwerpunkt_vertretung }}" />
+							</td>
+							<td>
+								<input type="text" class="form-control" placeholder="System"
+									   id="id_system" name="system" maxlength="150" readonly="readonly"
+									   value="{{ rolle.rollenname.system }}" />
+							</td>
+							<td width="16%">
+								<input type="text" class="form-control" readonly="readonly"
+									   id="id_datum" name="datum"
+									   value="{{ rolle.letzte_aenderung }}" />
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="5" >
+								<div class="collapse multi-collapse" id="rolle_{{ rolle }}">
+									<table width="100%" class="table-striped table-sm table-hover" >
+										<thead>
+											<tr>
+												<th width="20%">
+													AF
+												</th>
+												<th width="45%">
+													Anmerkung zur AF allgemein
+												</th>
+												{% for uid in selektierte_userids %}
+													<th class="text-center">
+														{{ uid }}
+													</th>
+												{% endfor %}
+												<th class="text-center">
+													Muss
+												</th>
+												<th class="text-center">
+													Einsatz
+												</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for meineaf in rolle.rollenname.tblrollehataf_set.all %}
+												<tr>
+													<td>{{ meineaf.af }}</td>
+													<td>{{ meineaf.bemerkung }}</td>
+
+													{% for uid in selektierte_userids %}
+														<td class="text-center">
+															{% if uid|make_list|first|lower == "d" and meineaf.get_einsatz_display != "Nur DV-User" %}
+																&nbsp;
+															{% else %}
+																{# Aus dem QueryElement meineaf.af muss ein String zur Suche in der Menge gemacht werden #}
+																{# Das folgende Statement geht leider nicht (findet falsche Substrings: #}
+																{# if meineaf.af|stringformat:"s"|lower in afmenge_je_userID|hash:uid|lower #}
+																{# Also musste ein programmierter Vergleich her #}
+																{% with menge=afmenge_je_userID|hash:uid %}
+																	{% if meineaf.af|stringformat:"s"|lower|vergleich:menge %}
+																		<img src="{% static 'admin/img/icon-yes.svg' %}">
+																	{% else %}
+																		<img src="{% static 'admin/img/icon-no.svg' %}">
+																	{% endif %}
+																{% endwith %}
+															{% endif %}
+														</td>
+													{% endfor %}
+
+													<td class="text-center">
+														{% if meineaf.mussfeld == None %}
+															<img src="{% static 'admin/img/icon-alert.svg' %}">
+														{% else %}
+                                                            {% if meineaf.mussfeld == True %}
+                                                                <img src="{% static 'admin/img/icon-yes.svg' %}">
+                                                            {% else %}
+                                                                <img src="{% static 'admin/img/icon-no.svg' %}">
+                                                            {% endif %}
+                                                        {% endif %}
+													</td>
+													<td class="text-center">
+														<small>{{ meineaf.get_einsatz_display }}</small>
+													</td>
+												</tr>
+											{% empty %}
+												<tr>
+													<td colspan="5">
+														<div class="form-control bg-danger col-12">Nix gefunden!?</div>
+													</td>
+												</tr>
+											{% endfor rolle.rollenname.tblrollehataf_set.all %}
+										</tbody>
+									</table>
+								</div>
+							</td>
+						</tr>
+					{% endfor userHatRolle_liste %}
+				</tbody>
+			</table>
+		</div>
+		{% else %}
+			{% if selektierter_name %}
+				{% if selektierter_name == -1 %}
+					<div class="col-12 bg-warning">Kein User selektiert</div>
+				{% else %}
+					<div class="col-12 bg-warning">Identität {{ selektierter_name }} ist noch keine Rolle zugeordnet</div>
+						<table class="table table-striped table-sm">
+							<tbody>
+								<tr>
+									<td>
+										<a href="{% url 'user_rolle_af-create' selektierte_userid %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+												<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25 rem" />
+										Hier</a>
+										können Sie neue Rollen für den User vergeben
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				{% endif %}
+			{% else %}
+				<div class="col-12">
+					Kein User selektiert
+				</div>
+			{% endif %}
+			</div>
+		{% endif %}
+	{% include "paginator.html" %}
+{% endblock content %}

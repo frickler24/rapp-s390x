@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'import' %}">Import neuer Daten</a></li>
+	<li class="breadcrumb-item active">Import neuer Daten - Kontrolle der Eingabedatei</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Import neuer Daten - {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+	<div class="container">
+        {% include 'rapp/import_ergebnis1.html' %}
+
+        <p>&nbsp;</p>
+        <div class="container alert-secondary">
+            <h5>Liste neuer oder wiedergefundener User</h5>
+            <div class="row">
+                {% with links=0 %}
+                    {% include 'rapp/import2_tabelle.html' %}
+                {% endwith %}
+            </div>
+        </div>
+        <p>&nbsp;</p>
+        <div class="container alert-secondary">
+            <h5>Liste nicht mehr gefundener, zu löschender User</h5>
+            <div class="row">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">UserID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Orga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in request.session.geloeschteUser %}
+                            <tr>
+                                {% for elem in user %}
+                                    <td>{{ elem }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% empty %}
+                            <tr><td>Keine zu löschenden User gefunden</td></tr>
+                        {% endfor neueUser %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <form id="form2" method="post" name="import" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="container bg-light py-3 mt-1">
+               <div class="row">
+                    <div class="row my-3" id="loading2" style="display:none;">
+                        <img src="{% static 'loading.gif' %}" alt="Lade..." />
+                    </div>
+               </div>
+               <div class="row">
+                   <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+                        <button class="btn btn-outline-danger " type="submit" id="hochladen"
+                                name="hochladen" value="submit">Inhalte aktualisieren!</button>
+                   </div>
+                   <div class="col pt-3 col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 alert alert-warning">
+                        Wenn die angezeigten Daten plausibel sind, weiter mit dem Button "User-Tabelle aktualisieren!",
+                        sonst abbrechen.<br />
+                        Bisher sind keine Daten in den Zieltabellen verändert worden.<br />
+                       <b>Achtung - dieser Schritt kann nicht rückgängig gemacht werden.</b>
+                   </div>
+                   <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+                       <button onclick="location.href = '{% url 'import_abbruch' %}';" type="reset"
+                               class="btn btn-outline-success expand " >Abbrechen</button>
+                   </div>
+               </div>
+            </div>
+        </form>
+        <script type="text/javascript">
+            (function (d) {
+                d.getElementById('hochladen').onclick = function () {
+                    d.getElementById('loading2').style.display = 'block';
+                    d.getElementById('hochladen').disabled = true;
+                    document.getElementById('form2').submit();
+                    return true;
+                };
+            }(document));
+        </script>
+	</div>
+{% endblock %}
+

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active">Ungenutzte Teams</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Ungenutzte Teams - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-md-8 col-lg-5 col-xl-4" style="text-align: bottom;">
+                <h1>Ungenutzte Teams</h1>
+            </div>
+            <div class="col mt-3">
+                <h5>
+                    Auflistung definierter Teams, denen keine User zugeordnet sind
+                </h5>
+            </div>
+        </div>
+        <div class="row mb-5 align-bottom">
+        </div>
+    </div>
+
+    <div class="container">
+        {% if teams %}
+            <div class="row">
+                <div class="col-2">
+                    <strong>ID</strong>
+                </div>
+                <div class="col-10">
+                    <strong>Teamname</strong>
+                </div>
+                {% for key, value in teams.items %}
+                    <div class="col-2" style="text-align: bottom;">
+                        <a href="{% url 'admin:rapp_tblorga_change' key %}" target="_blank" >
+                        {{ key }}
+                        </a>
+                    </div>
+                    <div class="col-10" style="text-align: bottom;">
+                        <a href="{% url 'admin:rapp_tblorga_change' key %}" target="_blank" >
+                        {{ value }}
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Es gibt keine ungenutzten Teams, oder die Antwort war falsch.</p>
+            {% if fehler %}
+                <p>Fehlermeldung: {{ fehler }}</p>
+            {% endif %}
+        {% endif %}
+    </div>
+    <p>&nbsp;</p>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+FROM python:3.6
+RUN apt update && apt upgrade -y && apt install -y curl vim net-tools nmap iputils*
+
+COPY requirements /tmp/requirements
+RUN pip install -r /tmp/requirements/prod.txt
+
+WORKDIR /RechteDB/RechteDB
+
+CMD "gunicorn" "-c" "guniconf.py" "RechteDB.wsgi"
+

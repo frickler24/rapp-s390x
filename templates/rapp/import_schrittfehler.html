@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'import' %}">Import neuer Daten</a></li>
+	<li class="breadcrumb-item active">Import neuer Daten - Fehler</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Import neuer Daten - {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    {% include 'rapp/import_anleitung.html' %}
+    <p>&nbsp;</p>
+
+    <div class="container bg-danger py-3 mt-1">
+        ACHTUNG! <br />
+        Es ist ein schwerer Schrittfehler beim Import aufgetreten.
+        <br />
+        Erwartet wurde Schritt Nummmer {{ request.session.erwarteter_schritt }},<br  />
+        angefordert wurde jedoch Schritt Nummmer {{ request.session.geforderter_schritt }}.<br />
+        Wurde vielleicht versucht, die Import-Seiten per Hand aufzurufen
+        oder eine alte Seite wieder aufgerufen?
+    </div>
+    <p>&nbsp;</p>
+</div>
+<form method="get" name="import">
+    <div class="container bg-light py-3 mt-1 alert-success">
+       <div class="row">
+           <div class="col py-3 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+               <button onclick="location.href = '{% url 'import_reset' %}';" type="reset"
+                       class="btn btn-outline-danger expand" >Löschen des Status und weiter zum nächsten Import</button>
+           </div>
+           <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+               <button onclick="location.href = '{% url 'home' %}';" type="reset"
+                       class="btn btn-outline-primary expand" >Weiter zur Startseite</button>
+           </div>
+       </div>
+    </div>
+</form>
+{% endblock %}
