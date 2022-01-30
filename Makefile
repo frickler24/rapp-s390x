@@ -26,7 +26,7 @@ hap:
 		-e TZ='Europe/Berlin' \
 		-v /home/linux1/RApp/other_files/haproxy:/usr/local/etc/haproxy:ro \
 		-v /home/linux1/RApp/other_files/certs:/certs:ro \
-		haproxy haproxy -f /usr/local/etc/haproxy/haproxy.cnf -d -V
+		haproxy:2.5.1 haproxy -f /usr/local/etc/haproxy/haproxy.cnf -d -V
 
 
 mariadb:

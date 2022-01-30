@@ -2,3 +2,4 @@
 other_files/
 *.pyc
 tars/python_1.9.10-buster.tar.gz
+.env
