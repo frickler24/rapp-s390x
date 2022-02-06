@@ -55,7 +55,7 @@ pmaneu:
 
 
 image:
-	docker build -t rapp .
+	docker build -t rapp -f dockerfiles/Dockerfile_full .
 
 
 rapptest:
@@ -63,7 +63,6 @@ rapptest:
 		--name testDjango \
 		--network mariaNetz \
 		-e TZ='Europe/Berlin' \
-		-v $$PWD:/RApp \
 		-v $$PWD/.env.docker:/RApp/.env \
 		rapp:latest sh -c "/RApp/manage.py test --no-input"
 
@@ -75,8 +74,6 @@ rappprod:
 		--network-alias rapp \
 		--restart unless-stopped \
 		-e TZ='Europe/Berlin' \
-		-v $$PWD:/RApp \
-		-v $$PWD/.env.docker:/RApp/.env \
 		rapp:latest
 
 status:

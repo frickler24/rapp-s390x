@@ -1,0 +1,29 @@
+FROM python:3.9.10-buster
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       mariadb-client \
+       vim \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN /usr/local/bin/python -m pip install --upgrade pip \
+    && pip install --upgrade pip
+
+RUN mkdir -p /RApp
+WORKDIR /RApp
+
+COPY requirements/* ./
+RUN pip install -r prod.txt
+
+COPY ./ /RApp
+RUN rm -rf tars otherfiles
+RUN mv .env.docker .env
+
+RUN useradd -ms /bin/bash rapp
+RUN chown -R rapp:rapp /RApp
+USER rapp
+
+EXPOSE 8000
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
