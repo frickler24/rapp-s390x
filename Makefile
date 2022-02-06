@@ -24,8 +24,8 @@ hap:
 		--network mariaNetz \
 		--network-alias hap \
 		-e TZ='Europe/Berlin' \
-		-v /home/linux1/RApp/other_files/haproxy:/usr/local/etc/haproxy:ro \
-		-v /home/linux1/RApp/other_files/certs:/certs:ro \
+		-v $$PWD/other_files/haproxy:/usr/local/etc/haproxy:ro \
+		-v $$PWD/other_files/certs:/certs:ro \
 		haproxy:2.5.1 haproxy -f /usr/local/etc/haproxy/haproxy.cnf -d -V
 
 
@@ -35,11 +35,10 @@ mariadb:
 		--network mariaNetz \
 		--network-alias maria \
 		--restart unless-stopped \
-		-p 13306:3306 \
 		-e TZ='Europe/Berlin' \
 		-e MYSQL_ROOT_PASSWORD=+++HvgMPR*** \
 		-v /home/linux1/datadir:/var/lib/mysql \
-		-v /home/linux1/RApp/mariadbconf.d:/etc/mysql/conf.d \
+		-v $$PWD/mariadbconf.d:/etc/mysql/conf.d \
 		mariadb:10.7
 
 pmaneu:
@@ -64,8 +63,8 @@ rapptest:
 		--name testDjango \
 		--network mariaNetz \
 		-e TZ='Europe/Berlin' \
-		-v /home/linux1/RApp:/RApp \
-		-v /home/linux1/RApp/.env.docker:/RApp/.env \
+		-v $$PWD:/RApp \
+		-v $$PWD/.env.docker:/RApp/.env \
 		rapp:latest sh -c "/RApp/manage.py test --no-input"
 
 rappprod:
@@ -76,8 +75,8 @@ rappprod:
 		--network-alias rapp \
 		--restart unless-stopped \
 		-e TZ='Europe/Berlin' \
-		-v /home/linux1/RApp:/RApp \
-		-v /home/linux1/RApp/.env.docker:/RApp/.env \
+		-v $$PWD:/RApp \
+		-v $$PWD/.env.docker:/RApp/.env \
 		rapp:latest
 
 status:
@@ -95,8 +94,8 @@ rappviele: vieleweg
 			--network-alias rapp$$i \
 			--restart unless-stopped \
 			-e TZ='Europe/Berlin' \
-			-v /home/lutz/Projekte/RechteDB:/RechteDB \
-			-v /home/lutz/Projekte/RechteDB/RechteDB:/RechteDB/code \
+			-v $$PWD:/RApp \
+			-v $$PWD/.env.docker:/RApp/.env \
 			rapp:latest; done')
 
 vorbereitung:
@@ -112,8 +111,8 @@ letsencrypt: vorbereitung
 		--ip=10.42.0.99 \
 		--network mariaNetz \
 		--network-alias letsencrypt \
-		--volume "/home/lutz/Projekte/RechteDB/other_files/letsencrypt/etc:/etc/letsencrypt:rw" \
-		--volume "/home/lutz/Projekte/RechteDB/other_files/letsencrypt/var:/var/lib/letsencrypt:rw" \
+		--volume "$$PWD/other_files/letsencrypt/etc:/etc/letsencrypt:rw" \
+		--volume "$$PWD/other_files/letsencrypt/var:/var/lib/letsencrypt:rw" \
 		certbot/certbot:latest \
 			certonly --standalone \
 				-d frickler.eichler-web.de \
@@ -122,10 +121,10 @@ letsencrypt: vorbereitung
 				--agree-tos \
 				--email m5@frickler24.de \
 				--http-01-port=80
-				sudo chown lutz /home/lutz/Projekte/RechteDB/other_files/letsencrypt/etc/live/frickler.eichler-web.de/privkey.pem
-		cat /home/lutz/Projekte/RechteDB/other_files/letsencrypt/etc/live/frickler.eichler-web.de/fullchain.pem \
-			/home/lutz/Projekte/RechteDB/other_files/letsencrypt/etc/live/frickler.eichler-web.de/privkey.pem \
-			> /home/lutz/Projekte/RechteDB/other_files/certs/RApp.pem
+				sudo chown lutz $$PWD/other_files/letsencrypt/etc/live/frickler.eichler-web.de/privkey.pem
+		cat $$PWD/other_files/letsencrypt/etc/live/frickler.eichler-web.de/fullchain.pem \
+			$$PWD/other_files/letsencrypt/etc/live/frickler.eichler-web.de/privkey.pem \
+			> $$PWD/other_files/certs/RApp.pem
 		docker rm -f hap
 		make hap
 		@echo
@@ -143,6 +142,7 @@ hap_port80und443:
 		--network-alias hap \
 		--restart unless-stopped \
 		-e TZ='Europe/Berlin' \
-		-v /home/lutz/Projekte/RechteDB/other_files/haproxy:/usr/local/etc/haproxy:ro \
-		-v /home/lutz/Projekte/RechteDB/other_files/certs:/certs:ro \
+		-v $$PWD/other_files/haproxy:/usr/local/etc/haproxy:ro \
+		-v $$PWD/other_files/certs:/certs:ro \
 		haproxy haproxy -f /usr/local/etc/haproxy/haproxy.cnf -d -V
+
