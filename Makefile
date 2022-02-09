@@ -143,3 +143,14 @@ hap_port80und443:
 		-v $$PWD/other_files/certs:/certs:ro \
 		haproxy haproxy -f /usr/local/etc/haproxy/haproxy.cnf -d -V
 
+proxy:
+	docker run -d \
+		--name proxy \
+		--network mariaNetz \
+		--network-alias proxy \
+		--restart unless-stopped \
+		-v $$PWD/mariadbconf.d/rapp.conf:/etc/nginx/conf.d/default.conf:ro \
+		-v $$PWD/tls/RApp.key:/etc/ssl/RApp.key:ro \
+		-v $$PWD/tls/RApp.crt:/etc/ssl/RApp.crt:ro \
+		-v $$PWD/staticfiles:/static:ro \
+		nginx:1.21.6
